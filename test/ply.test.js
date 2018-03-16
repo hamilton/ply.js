@@ -97,6 +97,23 @@ describe('group with booleans', ()=>{
     })
 })
 
+let ds3 = [
+    {date: new Date('2010-01-01'), x:1},
+    {date: new Date('2010-01-01'), x:1},
+    {date: new Date('2010-01-02'), x:1},
+    {date: new Date('2010-01-02'), x:1},
+]
+
+describe('group with Date objects', ()=> {
+    let date2Ply =new Ply(ds3).group('date').transform()
+    it('should group by the .toString representation of a Date object', ()=>{
+        const expected = Array.from(ds3.reduce((acc,v)=> {acc.add(v.date.toString()); return acc}, new Set([])))
+        const keys = Object.keys(date2Ply)
+        expect(keys).toEqual(expect.arrayContaining(expected))
+        expect(expected).toEqual(expect.arrayContaining(keys))
+    })
+})
+
 // reduce on its own narrows down to one row.
 
 describe('reduce without group', ()=> {
