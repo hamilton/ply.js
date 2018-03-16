@@ -26,6 +26,11 @@ const STEPS = {
 class Ply {
 
   constructor(data) {
+    if (!Array.isArray(data)) throw new Error('data must be an array')
+    // I guess this isn't a lot of objects to try. Let's go for it.
+    data.forEach(d=>{
+      if (!(typeof d == 'object' && d.constructor == Object)) throw Error('data must be an array of objects')
+    })
     this.data = data
     this.step = STEPS.DATASET
     this.funcs = []

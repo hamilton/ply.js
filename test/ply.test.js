@@ -26,6 +26,20 @@ let ds2 = [
     {w: 'i', x:'b', y: 100},
 ]
 
+describe('input error handling', ()=>{
+    it('handles the case of wrong inputs', ()=>{
+        expect(()=>new Ply()).toThrow()
+        expect(()=>new Ply('hello')).toThrow()
+        expect(()=>new Ply({})).toThrow()
+    })
+    it('handles the case of the correct inputs (arrays)', ()=> {
+        expect(()=>new Ply(ds2)).not.toThrow()
+    })
+    it('handles the case of an array where not all objects are objects', ()=>{
+        expect(()=>new Ply([...ds2, 10000])).toThrow()
+    })
+})
+
 describe(`basic group tests`, ()=>{
     let stringPly = new Ply(ds2).group('x', 'w').transform()
     it('returns an an object of arrays', ()=>{
