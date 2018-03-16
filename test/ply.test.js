@@ -192,3 +192,29 @@ describe('mapping a grouped data set', () => {
         expect(groupedMapPly).toEqual({ a: [ 1, 2 ], b: [ 100, 200 ] })
     })
 })
+
+describe('Ply.sum', ()=> {
+    let simplePly = new Ply(ds1).reduce({y: Ply.sum('y')}).transform()
+    it('sums numbers based on the accessor you pass in', ()=> {
+        expect(simplePly[0].y).toBe(ds1.map(d=>d.y).reduce((a,b)=> a+b, 0))
+    })
+    it('throws an error if the reduction is done against non-numbers', ()=> {
+        let sumStr = [
+            {x:'a', y:1},
+            {x:'a', y:1},
+            {x:'b', y:2},
+            {x:'b', y:2},
+        ]
+
+
+        expect(()=> {
+            let sumStrPly = new Ply(sumStr).group('y').reduce({
+                x: Ply.sum('x')
+            }).transform()
+        }).toThrow()
+
+       // expect(sumStrPly.map(d=>d.x)).toEqual(['0aa', '0bb']) // TODO - is this really what should be expected?
+        // seems like a dumb default.
+    })
+})
+

@@ -132,5 +132,19 @@ class Ply {
 }
 
 Ply.SEPARATOR = '||'
-//window.Ply = Ply
+Ply.sum = (field) => (arr) => arr.map(d=>{
+  if (!Number.isFinite(d[field])) throw new Error('cannot reduce non-Numbers')
+  return d[field]
+}).reduce((a,b)=>a+b,0)
+Ply.mean = (field) => (arr) => Ply.sum(field)(arr) / arr.length
+Ply.standardDeviation = (field) => null
+Ply.variance = (field) => null
+Ply.max = field => arr => Math.max(...arr.map(d=>d[field]))
+Ply.min = field => arr => Math.min(...arr.map(d=>d[field]))
+Ply.quantile = (q, field) => arr => {
+  arr.sort((a,b)=>a[field]-b[field])
+  return arr[Math.floor((arr.length-1)*q)][field]
+}
+Ply.median = field => arr => Ply.quantile(.5, field)(arr)
+
 export default Ply
