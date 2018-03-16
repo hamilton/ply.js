@@ -26,6 +26,11 @@ let ds2 = [
     {w: 'i', x:'b', y: 100},
 ]
 
+const sameArrayContents = (a,b) => {
+    expect(a).toEqual(expect.arrayContaining(b))
+    expect(b).toEqual(expect.arrayContaining(a))
+}
+
 describe('input error handling', ()=>{
     it('handles the case of wrong inputs', ()=>{
         expect(()=>new Ply()).toThrow()
@@ -53,20 +58,16 @@ describe(`basic group tests`, ()=>{
         Object.keys(stringPly).forEach((k)=> {
             let [kx, kw] = k.split('||')
             let subset = stringPly[k]
-            // check all kx to see if they match
-            // check all kw to see if they match
             expect(subset.map(d=>d.x).every((x)=>x === kx)).toBe(true)
             expect(subset.map(d=>d.w).every((w)=>w === kw)).toBe(true)
         })
     })
     it('expects the group value to be the pairwise set of observed grouped variables', ()=>{
         let keys = Object.keys(stringPly)
-        let expected = ['a||h', 'a||i', 'b||h', 'b||i', 'c||h', 'c||i']
-        const union = [...new Set([...keys, ...expected])]
-        expect(union.length - expected.length).toBe(0)
+        let expected = ['a||h', 'a||i', 'b||h', 'b||i']
+        sameArrayContents(keys, expected)
     })
     it('expects the subsets to have a length that matches the original data set, if filtered appropriately', ()=>{
-        // todo - rewrite test to match the description.
         let lengths = Object.keys(stringPly).map(g=>stringPly[g].length)
         expect(!lengths.some(d=>d==2)).toBe(false)
     })
@@ -75,12 +76,9 @@ describe(`basic group tests`, ()=>{
 describe('group with numbers', ()=> {
     let numPly = new Ply(ds2).group('y').transform()
     it('groups the numbers as strings', ()=>{
-        // there should be two keys.
-        // they should be string versions of the numbers.
         let stringValues = ['1', '100']
         let keys = Object.keys(numPly)
-        const union = [...new Set([...stringValues, ...keys])]
-        expect(union.length - keys.length).toBe(0)
+        sameArrayContents(stringValues, keys)
     })
     it('has subsets that matches the lengths of the original filtered version of the dataset', ()=> {
         expect(Object.keys(numPly).map(k=>numPly[k]).every((ds)=>ds.length==4)).toBe(true)
@@ -109,8 +107,7 @@ describe('group with Date objects', ()=> {
     it('should group by the .toString representation of a Date object', ()=>{
         const expected = Array.from(ds3.reduce((acc,v)=> {acc.add(v.date.toString()); return acc}, new Set([])))
         const keys = Object.keys(date2Ply)
-        expect(keys).toEqual(expect.arrayContaining(expected))
-        expect(expected).toEqual(expect.arrayContaining(keys))
+        sameArrayContents(expected,keys)
     })
 })
 
@@ -137,10 +134,26 @@ describe('reduce without group', ()=> {
     })
 })
 
-describe('reduce accurately crunches', ()=> {
-    let reducePly = new Ply(ds1).group('u')
-})
+describe('reduce a grouped data set with object of functions', ()=> {
+    let reducePly = new Ply(ds1).group('u').reduce({
+        x: (arr) => arr.length,
+        y: (arr) => arr.reduce((acc,v) => acc+v.z, 0)
+    }).transform()
 
+    it('reduces a group data set to have to right number of rows', ()=>{
+        expect(reducePly.length).toBe(2)
+    })
+
+    it('reduces a group data set to have only the defined variables', ()=> {
+        //x is 6, y is 600.
+        reducePly.forEach(d=>{
+            expect(d.x).toBe(6)
+            expect(d.y).toBe(600)
+        })
+        sameArrayContents(reducePly.map(d=>d.u), [true, false])
+    })
+    console.log(reducePly)
+})
 /* 
 tests to write:
 x - group: strings
