@@ -134,9 +134,6 @@ describe('reduce without group', ()=> {
     })
 })
 
-
-
-
 describe('reduce a grouped data set with object of functions', ()=> {
     let reducePly = new Ply(ds1).group('u').reduce({
         x: (arr) => arr.length,
@@ -164,5 +161,34 @@ describe('reduce a grouped data set with arguments that only have a value', () =
     it('passes the value if the reducer entry is not a function', ()=>{
         sameArrayContents(reducePly.map(d=>d.x), new Array(2).fill(10))
         sameArrayContents(reducePly.map(d=>d.y), new Array(2).fill('a'))
+    })
+})
+
+describe('mapping an ungrouped data set', ()=>{
+    let data = [{x: 'hello', y: 10000, z: 1}]
+    let ungroupedMapPly = new Ply(data).map((p)=>{ return {i: p.y}}).transform()
+    it('returns data that is the same length as the input', () => {
+        expect(ungroupedMapPly.length).toBe(data.length)
+    })
+    it('expects the mapping function to return an array of mapped return values', ()=> {
+        expect(ungroupedMapPly[0].i).toBe(data[0].y)
+    })
+})
+
+let ds4 = [
+    {x:'a', y: 1},
+    {x:'a', y: 2},
+    {x:'b', y:100},
+    {x:'b', y:200},
+]
+
+describe('mapping a grouped data set', () => {
+    let groupedMapPly = new Ply(ds4).group('x').map(d => { return d.y }).transform()
+    it('contains the same number of groups as an unmapped data set', ()=> {
+        let groupedNoMapPly = new Ply(ds4).group('x').transform()
+        sameArrayContents(Object.keys(groupedNoMapPly), Object.keys(groupedMapPly))
+    })
+    it('has groups that contain the mapped contents', ()=> {
+        expect(groupedMapPly).toEqual({ a: [ 1, 2 ], b: [ 100, 200 ] })
     })
 })

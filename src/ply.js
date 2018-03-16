@@ -58,11 +58,20 @@ class Ply {
   }
   
   map(mapper) {
-    if (this.step != STEPS.DATASET) {
-      throw new TypeError('cannot have a mapper on a grouped data set')
+    const mapData = (arr) => {
+      return arr.map(mapper)
     }
+    let step = this.step
+
     this.funcs.push((data)=>{
-      return data.map(mapper)
+      if (step === STEPS.GROUP) {
+        Object.keys(data).forEach(facets=>{
+          data[facets] = data[facets].map(mapper)
+        })
+
+        return data
+      }
+      else return data.map(mapper)
     })
     this.step = STEPS.DATASET
     return this
