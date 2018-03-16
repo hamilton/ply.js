@@ -41,7 +41,7 @@ class Ply {
   group(...f) {
     this.funcs.push((data)=>{
       return data.reduce((o,v)=> {
-        const facet = f.map(fi=>v[fi]).join('||')
+        const facet = f.map(fi=>v[fi]).join(Ply.SEPARATOR)
         if (!o.hasOwnProperty(facet)) o[facet] = []
         o[facet].push(v)
         return o
@@ -74,27 +74,38 @@ class Ply {
   }
 
   reduce(funcs) {
-    if (this.step != STEPS.GROUP) {
-      throw new TypeError('cannot have a reducer on an ungrouped data set')
+    // reduce the array to a single point
+    const reduceData = (arr) => {
+      let datapoint = {}
+      Object.keys(funcs).forEach(field=>{
+        datapoint[field] = funcs[field](arr)
+      })
+      return datapoint
     }
-    this.funcs.push((data)=>{
+    // a plainReducer reduces an array down to a single point w/ reduceData.
+    const plainReducer = (data) => {
+      return [reduceData(data)]
+    }
+    // a groupReducer iterates through the groups and runs plainReducer.
+    const groupReducer = (data) => {
       let newData = []
       Object.keys(data).forEach(gr=>{
         let dataGrouping = data[gr]
-        let datapoint = {}
+        let datapoint = reduceData(dataGrouping)
         this.facets.forEach((f)=>{
           datapoint[f] = dataGrouping[0][f]
-        })
-        Object.keys(funcs).forEach(newField=>{
-          datapoint[newField] = funcs[newField](dataGrouping)
         })
         newData.push(Object.assign({}, datapoint))
       })
       data = newData
       return data
-    })
+    }
+  
+    let reducer = this.step === STEPS.DATASET ? plainReducer : groupReducer
+
+    this.funcs.push(reducer)
     this.step = STEPS.DATASET
-	return this
+	  return this
   }
  
   transform() {
@@ -104,5 +115,7 @@ class Ply {
     return newData
   }
 }
+
+Ply.SEPARATOR = '||'
 //window.Ply = Ply
 export default Ply
