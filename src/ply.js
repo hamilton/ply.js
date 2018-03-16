@@ -83,7 +83,8 @@ class Ply {
     const reduceData = (arr) => {
       let datapoint = {}
       Object.keys(funcs).forEach(field=>{
-        datapoint[field] = funcs[field](arr)
+        if (typeof funcs[field] === 'function') datapoint[field] = funcs[field](arr)
+        else datapoint[field] = funcs[field]
       })
       return datapoint
     }

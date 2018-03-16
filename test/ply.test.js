@@ -134,12 +134,14 @@ describe('reduce without group', ()=> {
     })
 })
 
+
+
+
 describe('reduce a grouped data set with object of functions', ()=> {
     let reducePly = new Ply(ds1).group('u').reduce({
         x: (arr) => arr.length,
-        y: (arr) => arr.reduce((acc,v) => acc+v.z, 0)
+        y: (arr) => arr.reduce((acc,v) => acc+v.z, 0)    
     }).transform()
-
     it('reduces a group data set to have to right number of rows', ()=>{
         expect(reducePly.length).toBe(2)
     })
@@ -152,22 +154,15 @@ describe('reduce a grouped data set with object of functions', ()=> {
         })
         sameArrayContents(reducePly.map(d=>d.u), [true, false])
     })
-    console.log(reducePly)
 })
-/* 
-tests to write:
-x - group: strings
-x - group: non-strings
-- group: numbers
-- group: grouping functions
-    {facet: (dp) => returnSomeValueToGroup(dp)}, etc.
 
-- reduce: basic reduce without group
-- reduce: basic reduce with group
-
-- map: from dataset
-- map: from group
-
-Ply built-in reducer methods
-
-*/
+describe('reduce a grouped data set with arguments that only have a value', () => {
+    let reducePly = new Ply(ds1).group('u').reduce({
+        x: 10,
+        y: 'a'
+    }).transform()
+    it('passes the value if the reducer entry is not a function', ()=>{
+        sameArrayContents(reducePly.map(d=>d.x), new Array(2).fill(10))
+        sameArrayContents(reducePly.map(d=>d.y), new Array(2).fill('a'))
+    })
+})
