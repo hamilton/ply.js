@@ -274,8 +274,33 @@ describe('Ply.min', ()=>{
         expect(Ply.min('x')()).toBe(Infinity)
     })
 })
-
-describe('Ply.min', ()=>{})
-describe('Ply.quantile', ()=>{})
+describe('Ply.quantile', ()=>{
+    let xs = [1,2,3,4,5,6,7,8,9,10,11]
+    let ys = [1,2,3,4,5,6,7,8,9,10]
+    it('returns NaN if passed array is empty', ()=>{
+        expect( Ply.quantile(.5, 'x')([]) ).toBe(NaN)
+    })
+    it('throws an error if argument is not array', ()=> {
+        expect(()=>Ply.quantile(.5,'x')('hello')).toThrow()
+    })
+    it('calculates the quantile if passed in only a single value', ()=> {
+        let x1 = toDS(xs)
+        let x2 = toDS(ys)
+        expect(Ply.quantile(.5, 'x')(x2)).toBeCloseTo(5.5)
+        expect(Ply.quantile(0, 'x')(x2)).toBeCloseTo(1)
+        expect(Ply.quantile(1.5, 'x')(x2)).toBeCloseTo(10)
+        expect(Ply.quantile(3/10, 'x')(x2)).toBeCloseTo(3.5)
+        expect(Ply.quantile(.5, 'x')(x1)).toBeCloseTo(6)
+        expect(Ply.quantile(0, 'x')(x1)).toBeCloseTo(1)
+        expect(Ply.quantile(1.5, 'x')(x1)).toBeCloseTo(11)
+        expect(Ply.quantile(3/10, 'x')(x1)).toBeCloseTo(4)
+    })
+    it('calculates the quantiles if passed q is an array of proportions', ()=>{
+        let x1 = toDS(xs)
+        let x2 = toDS(ys)
+        sameArrayContents(Ply.quantile([0, .25, .5, .75, 1], 'x')(x2), [1,3,5.5,8,10])
+        sameArrayContents(Ply.quantile([0, .25, .5, .75, 1], 'x')(x1), [1,3,6,9,11])
+    })
+})
 describe('Ply.median', ()=>{})
 describe('Ply.IQR', ()=>{})

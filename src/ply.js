@@ -158,16 +158,19 @@ Ply.min = field => arr => {
 }
 
 Ply.quantile = (q, field) => arr => {
+  // R has 9 different ways to calculate quantile.
+  if (arr===undefined || !Array.isArray(arr)) throw new Error('data must be an array')
   if (!arr.length) return NaN
   let n = arr.length
   arr.sort((a,b)=>a[field] - b[field])
-
-  var qToI = (qi) => {
-    if (qi <= 0) return arr[0]
-    if (qi >= 1) return arr[n-1]
+  let qToI = (qi) => {
+    if (qi <= 0) return arr[0][field]
+    if (qi >= 1) return arr[n-1][field]
     let i = n*qi - 1
-    if (Math.isInteger(i)) return (arr[i] + arr[i+1]) / 2.0
-    return arr[Math.ceil(i)]
+    let out
+    if (Number.isInteger(i)) out = (arr[i][field] + arr[i+1][field]) / 2.0
+    else out = arr[Math.ceil(i)][field]
+    return out
   }
   return Array.isArray(q) ? q.map(qi=> qToI(qi)) : qToI(q)
 }
