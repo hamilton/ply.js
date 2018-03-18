@@ -195,26 +195,71 @@ describe('mapping a grouped data set', () => {
 
 describe('Ply.sum', ()=> {
     let simplePly = new Ply(ds1).reduce({y: Ply.sum('y')}).transform()
+    let sumStr = [
+        {x:'a', y:1},
+        {x:'a', y:1},
+        {x:'b', y:2},
+        {x:'b', y:2},
+    ]
     it('sums numbers based on the accessor you pass in', ()=> {
         expect(simplePly[0].y).toBe(ds1.map(d=>d.y).reduce((a,b)=> a+b, 0))
     })
     it('throws an error if the reduction is done against non-numbers', ()=> {
-        let sumStr = [
-            {x:'a', y:1},
-            {x:'a', y:1},
-            {x:'b', y:2},
-            {x:'b', y:2},
-        ]
-
-
         expect(()=> {
             let sumStrPly = new Ply(sumStr).group('y').reduce({
                 x: Ply.sum('x')
             }).transform()
         }).toThrow()
-
-       // expect(sumStrPly.map(d=>d.x)).toEqual(['0aa', '0bb']) // TODO - is this really what should be expected?
-        // seems like a dumb default.
+    })
+    it('throws an error if one the objects do not contain the key', ()=>{
+        expect(()=>{Ply.sum('z')(sumStr)}).toThrow()
+    })
+    it('returns 0 if the array passed in has length 0', ()=>{
+        expect(Ply.sum('x')([])).toBe(0)
+    })
+})
+let toDS = vals => vals.map(d=>{return {x:d}})
+describe('Ply.mean', () => {
+    it('returns NaN when array is empty', ()=> {
+        expect(Ply.mean('x')([])).toBe(NaN)
+    })
+    it('throws an error if any of the objects in array do not have the key', ()=> {
+        expect(()=>{
+            Ply.mean('x')([{a:10}])
+        }).toThrow()
+    })
+    it('throws an error if any of the objects in the array do not contain Number entries for given key', ()=> {
+        expect(()=> {
+            Ply.mean('x')([{x:'test'}])
+        }).toThrow()
+    })
+    it('computes the mean appropriately 1', () => {
+        let num = toDS([5,5,5,6,4,2,15])
+        expect(Ply.mean('x')(num)).toBeCloseTo(6)
+    })
+    it('computes the mean appropriately 2', ()=> {
+        let num = toDS([100,40,3,1,2])
+        expect(Ply.mean('x')(num)).toBeCloseTo(29.2)
+    })
+    // todo = more numerical tests.
+})
+describe('Ply.variance', ()=> {
+    it('returns 0 if data.length < 2', ()=> {
+        expect(Ply.variance('x')(toDS([10]))).toBe(0)
+    })
+    it('calculates the variance', ()=> {
+        let num = toDS([100,40,3,1,2])
+        expect(Ply.variance('x')(num)).toBeCloseTo(1837.7)
     })
 })
 
+describe('Ply.standardDeviation', ()=>{
+    it('calculates the standard deviation', () => {
+        expect(Ply.standardDeviation('x')(toDS([100,40,3,1,2]))).toBeCloseTo(42.8684)
+    })
+})
+describe('Ply.max', ()=>{})
+describe('Ply.min', ()=>{})
+describe('Ply.quantile', ()=>{})
+describe('Ply.median', ()=>{})
+describe('Ply.IQR', ()=>{})

@@ -1,23 +1,3 @@
-/* 
-ply.js is a small library that crunches down data, loosely based on Hadley Wickham's dplyr for R. Here's a rundown of the API:
-
-- `.group(...facets)` --- groups the data set based on `facets`, each full combination of which acts as a grouping facet.
-- `.reduce(reducerFunctions)` --- takes an object with keys representing the variable to be created by the reducer, and the value is a function that takes all the grouped data and outputs a single value. The output is a reduced data set with all the `facets` defined by the `group` function and all the reduced values.
-- `.filter(fcn)` --- filters the data set by a particular function. Works just like an Array filter.
-- `.map(fcn)` --- maps the data set onto
-
-And a single example of usage:
-
-let a = new Dataframe(x)
-a.group('c', 'd')
-  .reduce({
-	x: arr => arr.length,
-    y: arr => arr.map(d=>d.b).reduce((a,b)=>a+b,0)
-}}
-  .transform()
-
-*/
-
 const STEPS = {
     GROUP: 'group',
     DATASET: 'dataset'
@@ -132,19 +112,65 @@ class Ply {
 }
 
 Ply.SEPARATOR = '||'
-Ply.sum = (field) => (arr) => arr.map(d=>{
-  if (!Number.isFinite(d[field])) throw new Error('cannot reduce non-Numbers')
-  return d[field]
-}).reduce((a,b)=>a+b,0)
-Ply.mean = (field) => (arr) => Ply.sum(field)(arr) / arr.length
-Ply.standardDeviation = (field) => null
-Ply.variance = (field) => null
+
+Ply.sum = (field) => (arr) => {
+  if (!arr.length) return 0
+  return arr.map(d=>{
+    if (!Number.isFinite(d[field])) throw new Error('cannot reduce non-Numbers')
+    let value = d[field]
+    if (value === undefined) throw new Error(`key "${field}" missing from an object`)
+    return d[field]
+  }).reduce((a,b)=>a+b,0)
+}
+
+Ply.mean = (field) => (arr) => {
+  let n = arr.length
+  if (!n) return NaN
+  return Ply.sum(field)(arr) / n
+}
+
+Ply.variance = field => arr => {
+  const n = arr.length
+  if (n < 2) return 0
+  let M = arr[0][field]
+  if (M === undefined) throw new Error(`key "${field}" missing from an object`)
+  let S = 0
+  arr.forEach((d,i)=> {
+    let xi = d[field]
+    if (d[field] === undefined) throw new Error(`key "${field}" missing from an object`)
+    i = i+1
+    let Mp = M
+    M = Mp + (xi - Mp)/i 
+    S = S + (xi - M) * (xi - Mp)
+  })
+  return S / (n-1)
+}
+
+Ply.standardDeviation = field => arr => Math.sqrt(Ply.variance(field)(arr))
+
 Ply.max = field => arr => Math.max(...arr.map(d=>d[field]))
 Ply.min = field => arr => Math.min(...arr.map(d=>d[field]))
+
 Ply.quantile = (q, field) => arr => {
-  arr.sort((a,b)=>a[field]-b[field])
-  return arr[Math.floor((arr.length-1)*q)][field]
+  if (!arr.length) return NaN
+  let n = arr.length
+  arr.sort((a,b)=>a[field] - b[field])
+
+  var qToI = (qi) => {
+    if (qi <= 0) return arr[0]
+    if (qi >= 1) return arr[n-1]
+    let i = n*qi - 1
+    if (Math.isInteger(i)) return (arr[i] + arr[i+1]) / 2.0
+    return arr[Math.ceil(i)]
+  }
+  return Array.isArray(q) ? q.map(qi=> qToI(qi)) : qToI(q)
 }
+
+/* quantile cases */
 Ply.median = field => arr => Ply.quantile(.5, field)(arr)
+Ply.IQR = field => arr => {
+  let [q25, q75] =  Ply.quantile([.25,.75], field)(arr)
+  return q75 - q25
+}
 
 export default Ply
