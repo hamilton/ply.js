@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>ply.js documentation - iodide</title>
+<link rel="stylesheet" type="text/css" href="https://iodide-project.github.io/master/iodide.master.css">
+</head>
+<body>
+<script id="jsmd" type="text/jsmd">
+%% meta
+{
+  "title": "ply.js documentation",
+  "viewMode": "presentation",
+  "lastSaved": "2018-03-18T01:38:14.962Z",
+  "lastExport": "2018-03-18T02:05:17.294Z"
+}
+
+%% md
+# ply.js
+
+[Github Repository](https://github.com/hamilton/ply.js)
+
+`ply.js` is a small library designed to make grouping and crunching down datasets easier in Javascript. The API is inspired by Hadley Wickham's [dplyr](http://dplyr.tidyverse.org/) library.
+
+Javascript doesn't have a particularly natural way of representing datasets. Some users tend to represent data as an array of objects - something like this:
+
+```javascript
+let data = [
+    {u: true,  v: true,  w: 'h', x: 'a', y: 1, z: 100},
+    {u: false, v: true,  w: 'h', x: 'a', y: 1, z: 100},
+    {u: true,  v: true,  w: 'i', x: 'a', y: 1, z: 100},
+    {u: false, v: true,  w: 'i', x: 'a', y: 1, z: 100},
+	...
+]
+```
+
+`ply.js` lets you do quick and easy data analysis with row-based data sets. The API is very straightforward.
+
+```
+let sd = new Ply(data)
+  .group('w', 'x')  // groups the data by variables w and x
+  .reduce({         // describes what new variables to create with our grouping
+    ySum: (arr) => arr.reduce((acc,v)=>acc+v.y,0),
+    yLength: (arr) => arr.length                        
+  })
+  .transform()      // returns the results
+
+```
+
+
+%% md
+## Examples
+
+To try these examples for yourself, click 'edit' on the top right corner.
+
+%% md
+### group a small data set and sum / count the values.
+
+```
+let data = [
+    {date: '2010-01-02', color: 'green', x: 100},
+    {date: '2010-01-02', color: 'green', x: 120},
+    {date: '2010-01-03', color: 'green', x: 142},
+    {date: '2010-01-03', color: 'green', x: 130},
+    {date: '2010-01-02', color: 'red', x: 70},
+    {date: '2010-01-02', color: 'red', x: 87},
+    {date: '2010-01-03', color: 'red', x: 95},
+    {date: '2010-01-03', color: 'red', x: 99}
+]
+
+// 1. group by color and date
+// 2. get length of groups, as well as sum of x per grouping
+let byColorAndDate = new Ply(data)
+    .group('date', 'color') 
+    .reduce({
+      xSum:    arr => arr.reduce((acc,v)=>acc+v.x, 0),
+      xLength: arr => arr.length
+     })
+    .transform()
+
+```
+
+
+%% md
+### get mean, median, and standard deviation of groups
+
+Here, we use some [reducer helper functions](#reducer-helper-functions) to get summary statistics of our group.
+
+```
+let data = [
+    {date: '2018-01-02', color: 'green', x: 100},
+    {date: '2018-01-02', color: 'green', x: 120},
+    {date: '2018-01-03', color: 'green', x: 142},
+    {date: '2018-01-03', color: 'green', x: 130},
+    {date: '2018-01-02', color: 'red', x: 70},
+    {date: '2018-01-02', color: 'red', x: 87},
+    {date: '2018-01-03', color: 'red', x: 95},
+    {date: '2018-01-03', color: 'red', x: 99},
+    ... // let's say 1,000 more rows
+]
+
+let summary = new Ply(data)
+  .group('date', 'color')
+  .reduce({
+    mean: Ply.mean('x'),
+    median: Ply.median('x'),
+    stdev: Ply.standardDeviation('x'),
+    IQR: Ply.IQR('x'),
+    q75: Ply.quantile(.75, 'x')
+  })
+  .transform()
+```
+
+
+
+
+%% md
+
+## API
+
+### basic features
+
+- __`new Ply(data)`__ Creates a new Ply object with data.
+- __`.group(...facets)`__ Creates a new grouped data set based on the facet keys. The resulting object has keys based on the facet combinations, and values which are the row elements that contain those facets.
+- __`.reduce({...newVariableFunctions})`__ - reduces a group data set and outputs new variables based on the argument passed.
+- __`.map(mapFunction)`__ - functions just like the array `map` function, but works on both grouped and ungrouped Plys.
+
+### reducer helper functions
+
+%% md
+
+
+%% js
+</script>
+<div id='page'></div>
+<script src='https://iodide-project.github.io/master/iodide.master.js'></script>
+</body>
+</html>
