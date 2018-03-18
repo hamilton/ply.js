@@ -177,8 +177,12 @@ Ply.quantile = (q, field) => arr => {
 
 /* quantile cases */
 Ply.median = field => arr => Ply.quantile(.5, field)(arr)
+
 Ply.IQR = field => arr => {
-  let [q25, q75] =  Ply.quantile([.25,.75], field)(arr)
+  if (!arr.length) return NaN
+  const iqrs = Ply.quantile([.25,.75], field)(arr)
+  let [q25, q75] =  iqrs
+  
   return q75 - q25
 }
 

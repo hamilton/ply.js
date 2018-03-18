@@ -233,13 +233,14 @@ describe('Ply.mean', () => {
             Ply.mean('x')([{x:'test'}])
         }).toThrow()
     })
-    it('computes the mean appropriately 1', () => {
-        let num = toDS([5,5,5,6,4,2,15])
-        expect(Ply.mean('x')(num)).toBeCloseTo(6)
-    })
-    it('computes the mean appropriately 2', ()=> {
-        let num = toDS([100,40,3,1,2])
-        expect(Ply.mean('x')(num)).toBeCloseTo(29.2)
+    it('computes the mean appropriately', () => {
+        expect(Ply.mean('x')(toDS([5,5,5,6,4,2,15]))).toBeCloseTo(6)
+        expect(Ply.mean('x')(toDS([100,40,3,1,2]))).toBeCloseTo(29.2)
+        expect(Ply.mean('x')(
+                toDS([ 643.234, 4545.21, 100.4, 174.43, 532.53, 164.73, 8436.53]))
+            )
+            .toBeCloseTo(2085.295)
+       
     })
     // todo = more numerical tests.
 })
@@ -274,9 +275,10 @@ describe('Ply.min', ()=>{
         expect(Ply.min('x')()).toBe(Infinity)
     })
 })
+
+let xs = [1,2,3,4,5,6,7,8,9,10,11]
+let ys = [1,2,3,4,5,6,7,8,9,10]
 describe('Ply.quantile', ()=>{
-    let xs = [1,2,3,4,5,6,7,8,9,10,11]
-    let ys = [1,2,3,4,5,6,7,8,9,10]
     it('returns NaN if passed array is empty', ()=>{
         expect( Ply.quantile(.5, 'x')([]) ).toBe(NaN)
     })
@@ -302,5 +304,31 @@ describe('Ply.quantile', ()=>{
         sameArrayContents(Ply.quantile([0, .25, .5, .75, 1], 'x')(x1), [1,3,6,9,11])
     })
 })
-describe('Ply.median', ()=>{})
-describe('Ply.IQR', ()=>{})
+describe('Ply.median', ()=>{
+    let med1 = toDS(xs)
+    let med2 = toDS(ys)
+    it('returns NaN if passed array is empty', ()=>{
+        expect( Ply.median('x')([]) ).toBe(NaN)
+    })
+    it('throws an error if argument is not array', ()=> {
+        expect(()=>Ply.median('x')('hello')).toThrow()
+    })
+    it('calculates the median using Ply.quantile', ()=>{
+        expect(Ply.median('x')(med1)).toBeCloseTo(6)
+        expect(Ply.median('x')(med2)).toBeCloseTo(5.5)
+    })
+})
+describe('Ply.IQR', ()=>{
+    let med1 = toDS(xs)
+    let med2 = toDS(ys)
+    it('returns NaN if passed array is empty', ()=>{
+        expect( Ply.IQR('x')([]) ).toBe(NaN)
+    })
+    it('throws an error if argument is not array', ()=> {
+        expect(()=>Ply.IQR('x')('hello')).toThrow()
+    })
+    it('calculates the IQR', ()=> {
+        expect(Ply.IQR('x')(med1)).toBeCloseTo(6)
+        expect(Ply.IQR('x')(med2)).toBeCloseTo(5)
+    })
+})
