@@ -258,7 +258,23 @@ describe('Ply.standardDeviation', ()=>{
         expect(Ply.standardDeviation('x')(toDS([100,40,3,1,2]))).toBeCloseTo(42.8684)
     })
 })
-describe('Ply.max', ()=>{})
+describe('Ply.max', ()=>{
+    it('calculates the max using Math.max', ()=> {
+        expect(Ply.max('x')(toDS([0,10,100]))).toBe(100)
+    })
+    it('returns exactly what Math.max would return on an empty argument list', ()=> {
+        expect(Ply.max('x')()).toBe(-Infinity)
+    })
+})
+describe('Ply.min', ()=>{
+    it('calculates the max using Math.min', ()=> {
+        expect(Ply.min('x')(toDS([0,10,100]))).toBe(0)
+    })
+    it('returns exactly what Math.min would return on an empty argument list', ()=> {
+        expect(Ply.min('x')()).toBe(Infinity)
+    })
+})
+
 describe('Ply.min', ()=>{})
 describe('Ply.quantile', ()=>{})
 describe('Ply.median', ()=>{})

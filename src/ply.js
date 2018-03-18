@@ -148,8 +148,14 @@ Ply.variance = field => arr => {
 
 Ply.standardDeviation = field => arr => Math.sqrt(Ply.variance(field)(arr))
 
-Ply.max = field => arr => Math.max(...arr.map(d=>d[field]))
-Ply.min = field => arr => Math.min(...arr.map(d=>d[field]))
+Ply.max = field => arr => {
+  if (arr===undefined || !arr.length) return -Infinity
+  return Math.max(...arr.map(d=>d[field]))
+}
+Ply.min = field => arr => {
+  if (arr===undefined || !arr.length) return Infinity
+  return Math.min(...arr.map(d=>d[field]))
+}
 
 Ply.quantile = (q, field) => arr => {
   if (!arr.length) return NaN
