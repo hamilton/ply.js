@@ -12,7 +12,7 @@
   "title": "ply.js documentation",
   "viewMode": "presentation",
   "lastSaved": "2018-03-18T01:38:14.962Z",
-  "lastExport": "2018-03-18T02:05:17.294Z"
+  "lastExport": "2018-03-18T02:22:25.506Z"
 }
 
 %% md
@@ -47,7 +47,6 @@ let sd = new Ply(data)
 
 ```
 
-
 %% md
 ## Examples
 
@@ -80,7 +79,6 @@ let byColorAndDate = new Ply(data)
 
 ```
 
-
 %% md
 ### get mean, median, and standard deviation of groups
 
@@ -111,11 +109,7 @@ let summary = new Ply(data)
   .transform()
 ```
 
-
-
-
 %% md
-
 ## API
 
 ### basic features
@@ -126,6 +120,44 @@ let summary = new Ply(data)
 - __`.map(mapFunction)`__ - functions just like the array `map` function, but works on both grouped and ungrouped Plys.
 
 ### reducer helper functions
+
+All the reducer helper functions return a _function_ that takes an array, pulls out all the data associated with `key`, then returns the output of that function.
+
+Here's how they look in practice:
+
+```
+let data = [
+	{facet: 'a', x: 10},
+    {facet: 'b', x: 15},
+    ...
+]
+
+const ply = new Ply(data)
+let out = ply
+  .group('facet')
+  .reduce({
+    avg: Ply.mean('x'),
+    sd: Ply.standardDeviation('x')
+  })
+  .transform()
+```
+
+Alternatively, you can just use them directly.
+
+```
+let mean = Ply.mean('x')(data)
+```
+
+#### functions
+
+- __`Ply.sum(key)`__ returns a sum.
+- __`Ply.mean(key)`__ returns the mean.
+- __`Ply.variance(key)`__ returns the variance, calculated via Welford's method.
+- __`Ply.standardDeviation(key)`__ returns the standard deviation.
+- __`Ply.quantile(q, key)`__ returns the value at quantile `q`.
+- __`Ply.median(key)`__ shorthand for `Ply.quantile(.5, key)`.
+- __`Ply.IQR(key)`__ returns the inter-quartile range.
+- __`Ply.mode(key)`__ returns the mode.
 
 %% md
 
