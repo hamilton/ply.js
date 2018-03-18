@@ -193,6 +193,19 @@ describe('mapping a grouped data set', () => {
     })
 })
 
+describe('clearing a Ply object', ()=> {
+    let test = new Ply(ds1).group('x').map(d => { return d.y })
+    let out1 = test.transform()
+    let out2 = test.clear().reduce({x: (arr) => arr.length}).transform()
+    let out3 = test.clear().reduce({x: (arr) => arr.length}).transform()
+    let out4 = test.clear().reduce({y: (arr) => arr.length}).transform()
+    it('clears the Ply object by setting funcs=[] and step=STEPS.DATASET', ()=> {
+        expect(out1).not.toEqual(out2)
+        expect(out2).toEqual(out3)
+        expect(out2).not.toEqual(out4)
+    })
+})
+
 
 
 /* ---------------------------------------------------------------- */

@@ -12,7 +12,7 @@
   "title": "ply.js documentation",
   "viewMode": "presentation",
   "lastSaved": "2018-03-18T01:38:14.962Z",
-  "lastExport": "2018-03-18T02:25:49.274Z"
+  "lastExport": "2018-03-18T14:41:24.388Z"
 }
 
 %% md
@@ -20,9 +20,9 @@
 
 [Github Repository](https://github.com/hamilton/ply.js)
 
-`ply.js` is a small library designed to make grouping and crunching down datasets easier in Javascript. The API is inspired by Hadley Wickham's [dplyr](http://dplyr.tidyverse.org/) library.
+`ply.js` is a small javascript library designed to to group, summarize, and manipulate tabular data sets, using an API inspired by Hadley Wickham's [dplyr](http://dplyr.tidyverse.org/) library for R.
 
-Javascript doesn't have a particularly natural way of representing datasets. Some users tend to represent data as an array of objects - something like this:
+Here's an example:
 
 ```javascript
 let data = [
@@ -32,11 +32,7 @@ let data = [
     {u: false, v: true,  w: 'i', x: 'a', y: 1, z: 100},
 	...
 ]
-```
 
-`ply.js` lets you do quick and easy data analysis with row-based data sets. The API is very straightforward.
-
-```
 let sd = new Ply(data)
   .group('w', 'x')  // groups the data by variables w and x
   .reduce({         // describes what new variables to create with our grouping
@@ -50,7 +46,7 @@ let sd = new Ply(data)
 %% md
 ## Examples
 
-To try these examples for yourself, click 'edit' on the top right corner.
+To try these examples for yourself, click 'edit' on the top right corner of this page.
 
 %% md
 ### group a small data set and sum / count the values.
@@ -151,8 +147,6 @@ let mean = Ply.mean('x')(data)
 #### functions
 
 - __`Ply.sum(key)`__ returns a sum.
-- __`Ply.max(key)`__ returns the max.
-- __`Ply.min(key)`__ returns the max.
 - __`Ply.mean(key)`__ returns the mean.
 - __`Ply.variance(key)`__ returns the variance, calculated via Welford's method.
 - __`Ply.standardDeviation(key)`__ returns the standard deviation.
@@ -162,9 +156,11 @@ let mean = Ply.mean('x')(data)
 - __`Ply.mode(key)`__ returns the mode.
 
 %% md
+## next steps
 
-
-%% js
+- abstract away the implementation so we can have a distributed version using:
+	- the `WebWorker` API
+    - processes (with node)
 </script>
 <div id='page'></div>
 <script src='https://iodide-project.github.io/master/iodide.master.js'></script>

@@ -17,7 +17,7 @@ class Ply {
     this.facets = []
   }
 
-  reset() {
+  clear() {
     this.funcs = []
     this.step = STEPS.DATASET
     return this
