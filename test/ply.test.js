@@ -332,3 +332,19 @@ describe('Ply.IQR', ()=>{
         expect(Ply.IQR('x')(med2)).toBeCloseTo(5)
     })
 })
+
+describe('Ply.mode', ()=>{
+    let mode1 = toDS(['a','a','a','a','a','c','b','b','b'])
+    let mode2 = toDS(['a', 'b'])
+    it('returns null if passed array is empty', () => {
+        expect(Ply.mode('x')([])).toBe(null)
+    })
+    it('throws if non-array is passed', () => {
+        expect(()=>Ply.mode('x')({})).toThrow()
+    })
+    it('calculates the mode when the case is clear', ()=> {
+        expect(Ply.mode('x')(mode1)).toBe('a')
+        // this one feels wrong. It should probably return 'a' and 'b'. hmm.
+        expect(Ply.mode('x')(mode2)).toBe('a')
+    })
+})

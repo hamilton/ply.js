@@ -186,4 +186,17 @@ Ply.IQR = field => arr => {
   return q75 - q25
 }
 
+Ply.mode = field => arr => {
+  if (!Array.isArray(arr)) throw new Error('data must be an Array')
+  if (!arr.length) return null
+  let counts = Object.entries(arr.reduce((acc,v)=>{
+    acc[v[field]] = acc[v[field]] + 1 || 0
+    return acc
+  }, {}))
+  let topVal = Math.max(...counts.map(c=>c[1]))
+  let modeI = counts.findIndex(c=>c[1] === topVal) // only returns the first it finds.
+  return counts[modeI][0]
+
+}
+
 export default Ply
