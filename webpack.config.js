@@ -34,6 +34,7 @@ module.exports = (env) => {
     output: {
       path: BUILD_DIR,
       filename: `ply.js`,
+      library: 'ply',
     },
     watchOptions: { poll: true }
   }
