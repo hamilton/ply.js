@@ -29,7 +29,7 @@ let CSS_PATH_STRING
 module.exports = (env) => {
 
   return {
-    entry: `${APP_DIR}/ply.js`,
+    entry: `${APP_DIR}/src.js`,
     mode: 'development',
     output: {
       path: BUILD_DIR,
