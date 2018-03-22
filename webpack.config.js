@@ -35,7 +35,7 @@ module.exports = (env) => {
       path: BUILD_DIR,
       filename: `ply.js`,
       library: 'ply',
-      libraryTarget: 'umd'
+      libraryTarget: 'var'
     },
     watchOptions: { poll: true }
   }
