@@ -27,6 +27,7 @@ let CSS_PATH_STRING
 
 // const config
 module.exports = (env) => {
+
   return {
     entry: `${APP_DIR}/ply.js`,
     mode: 'development',

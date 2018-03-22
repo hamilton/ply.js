@@ -16,7 +16,7 @@
     }
   },
   "author": "",
-  "license": "ISC",
+  "license": "MPL-2.0",
   "devDependencies": {
     "babel-core": "^6.25.0",
     "babel-eslint": "^8.0.3",
