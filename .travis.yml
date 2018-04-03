@@ -1,0 +1,14 @@
+language: node_js
+
+node_js:
+  - "lts/*"
+  - "8"
+
+install:
+  - npm install
+
+script:
+  - npm test
+
+before_deploy:
+  - npm run build
