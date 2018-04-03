@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "jest --no-cache",
-    "start": "webpack --watch --env dev"
+    "start": "webpack --watch --env dev",
+    "build": "webpack  --env prod",
+    "lint": "eslint src/ test/ --config=.eslintrc.js --ext=.js -f unix"
   },
   "jest": {
     "transformIgnorePatterns": [
@@ -26,8 +28,17 @@
     "babel-plugin-transform-es2015-modules-commonjs": "^6.26.0",
     "babel-preset-es2016": "^6.24.1",
     "enzyme": "^3.3.0",
+    "eslint": "^4.19.1",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-config-google": "^0.9.1",
+    "eslint-loader": "^1.9.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jest": "^21.12.1",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.6.1",
     "jest": "^23.0.0-alpha.0",
     "jest-cli": "^23.0.0-alpha.0",
+    "uglifyjs-webpack-plugin": "^1.2.4",
     "webpack": "^4.1.1",
     "webpack-cli": "^2.0.12"
   }
