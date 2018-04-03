@@ -35,12 +35,13 @@ class Ply {
   }
 
   map(mapper) {
+    const { step } = this
+
     this.funcs.push((data) => {
-      if (this.step === STEPS.GROUP) {
+      if (step === STEPS.GROUP) {
         Object.keys(data).forEach((facets) => {
           data[facets] = data[facets].map(mapper)
         })
-
         return data
       }
       return data.map(mapper)

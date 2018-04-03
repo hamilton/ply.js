@@ -150,8 +150,7 @@ describe('reduce without group', () => {
   it('has its fields reduced to two entries', () => {
     expect(Object.keys(p[0]).length).toBe(Object.keys(reducers).length)
   })
-  it('has fields that match the reducer fields', () => {
-    expect(p[0].a).toBe(null)
+  it('has fields that match the reducer field', () => {
     expect(p[0].b).toBe(ds1.length)
   })
   it('is a single object in an array', () => {
