@@ -27,7 +27,7 @@ describe('Dataframe constructor', () => {
     expect(col1.columnNames.length).toBe(data.columns.length)
     expect(col1.rowNames.length).toBe(data.columns[0].length)
     expect(col1.rowNames).toEqual([0, 1, 2, 3])
-    expect(col1.columnNames).toEqual([0, 1])
+    expect(col1.columnNames).toEqual(['x1', 'x2'])
   })
   it('handles an object of values - columns, column names, and row names', () => {
     const data = {
@@ -186,5 +186,21 @@ describe('get', () => {
   it('returns an error if a non-Number is passed in', () => {
     expect(() => { df.get('a') }).toThrow()
     expect(() => { df.get(new Date()) }).toThrow()
+  })
+  it('gets the index correctly', () => {
+    const row1 = df.get(0)
+    const row2 = df.get(1)
+    expect(row1).toEqual({ X: 1, Y: 'a' })
+    expect(row2).toEqual({ X: 2, Y: 'b' })
+  })
+  it('operates as expected when added columns and rows', () => {
+    df.appendRow({ X: 3, Y: 'c' })
+    df.appendColumn(['aa', 'bb', 'cc'], 'Z')
+    const row1 = df.get(0)
+    const row2 = df.get(1)
+    const row3 = df.get(2)
+    expect(row1).toEqual({ X: 1, Y: 'a', Z: 'aa' })
+    expect(row2).toEqual({ X: 2, Y: 'b', Z: 'bb' })
+    expect(row3).toEqual({ X: 3, Y: 'c', Z: 'cc' })
   })
 })

@@ -21,7 +21,11 @@ export default class Dataframe {
         (arg.columnNames && arg.columnNames.length))) {
         throw Error('Cannot have rowNames or columnNames without columns')
       }
-      this.DF$columnNames = arg.columnNames || this.DF$columns.map((c, i) => i)
+      this.DF$columnNames = arg.columnNames || this.DF$columns.map((c, i) => {
+        const ki = `x${this.DF$usedColumnNames}`
+        this.DF$usedColumnNames += 1
+        return ki
+      })
       this.setColumnMap()
       this.DF$rowNames = arg.rowNames ||
         (this.DF$columns.length ? this.DF$columns[0].map((r, j) => j) : [])
@@ -62,18 +66,19 @@ export default class Dataframe {
     } else if (isPlainObject(row)) {
       Object.keys(row).forEach((k) => {
         const v = row[k]
-        if (k in this.DF$columnNames) {
+        if (this.DF$columnNames.includes(k)) {
           const index = this.getColumnMap(k)
           this.DF$columns[index].push(v)
         }
       })
       // make sure to append undefined values for keys that aren't there.
-      Object.keys(this.DF$columnNames)
+      this.DF$columnNames
         .filter(col => !Object.keys(row).includes(col))
         .forEach((col) => {
           const index = this.getColumnMap(col)
           this.DF$columns[index].push(undefined)
         })
+      // console.log(this.DF$columnNames, this.DF$columns)
     }
     this.DF$rowNames.push(rowName)
     return this
@@ -144,7 +149,7 @@ export default class Dataframe {
     if (i >= this.height || i < 0) throw Error('get index is out of bounds')
     if (!Number.isInteger(i)) throw Error('get index is not an Integer')
     return this.DF$columnNames
-      .map(n => [n, this.DF$columnNames[this.getColumnMap(n)][i]])
+      .map(n => [n, this.DF$columns[this.getColumnMap(n)][i]])
       .reduce((acc, v) => {
         const [k, vi] = v
         acc[k] = vi
