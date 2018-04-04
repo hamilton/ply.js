@@ -48,10 +48,10 @@ describe('Dataframe constructor', () => {
 })
 
 describe('getters and setters', () => {
+  const data = {
+    columns: [[1, 2, 3, 4], ['a', 'b', 'c', 'd']],
+  }
   it('throws error if rowName provided is not of same length or is not an array', () => {
-    const data = {
-      columns: [[1, 2, 3, 4], ['a', 'b', 'c', 'd']],
-    }
     const rowNames1 = ['a', 'b', 'c']
     const rowNames2 = { a: 10, b: 20, c: 30 }
     const rowNames3 = new Date()
@@ -64,9 +64,6 @@ describe('getters and setters', () => {
   })
 
   it('gets and sets rowNames', () => {
-    const data = {
-      columns: [[1, 2, 3, 4], ['a', 'b', 'c', 'd']],
-    }
     const rowNames = ['a', 'b', 'c', 'd']
     const df1 = new Dataframe(data)
     df1.rowNames = rowNames.map(r => r) // try doing full on copy
@@ -74,9 +71,6 @@ describe('getters and setters', () => {
   })
 
   it('throws error if columnName provided is not of same length or is not an array', () => {
-    const data = {
-      columns: [[1, 2, 3, 4], ['a', 'b', 'c', 'd']],
-    }
     const colNames1 = ['a', 'b', 'c']
     const colNames2 = { a: 10, b: 20, c: 30 }
     const colNames3 = new Date()
@@ -89,12 +83,36 @@ describe('getters and setters', () => {
   })
 
   it('gets and sets columnNames', () => {
-    const data = {
-      columns: [[1, 2, 3, 4], ['a', 'b', 'c', 'd']],
-    }
     const columnNames = ['X', 'Y']
     const df1 = new Dataframe(data)
     df1.columnNames = columnNames.map(r => r) // try doing full on copy
     expect(df1.columnNames).toEqual(columnNames)
   })
+  it('gets the dim, width, and length accurately', () => {
+    const df = new Dataframe(data)
+    expect(df.width).toBe(2)
+    expect(df.height).toBe(4)
+    expect(df.dim).toEqual([2, 4])
+  })
+})
+
+
+describe('appendRow', () => {
+  const data = {
+    columns: [[1, 2], ['a', 'b']],
+    rowNames: ['A', 'B'],
+  }
+  it('throws an error if the row type is not accepted', () => {
+    const df = new Dataframe(data)
+    expect(() => { df.appendRow() }).toThrow()
+    expect(() => { df.appendRow('asodifn') }).toThrow()
+    expect(() => { df.appendRow(new Date()) }).toThrow()
+  })
+  it('appends an array row even without the presence of a label', () => {
+    const df = new Dataframe(data)
+    df.appendRow([3, 'c'])
+    expect(df.rowNames).toEqual(['A', 'B', undefined])
+  })
+
+  it('appends a row with a label', () => {})
 })

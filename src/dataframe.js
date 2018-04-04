@@ -30,10 +30,30 @@ export default class Dataframe {
   // eachRow(){}
 
   // CBIND
-  // appendRow(){}
+
+  appendRow(row, rowName) {
+    row.forEach((val, i) => {
+      this.DF$columns[i].push(val)
+    })
+    this.DF$rowNames.push(rowName)
+    return this
+  }
   // appendColumn(){}
 
   // GETTERS / SETTERS
+
+  get width() {
+    return this.DF$columns.length
+  }
+
+  get height() {
+    return this.DF$columns[0].length
+  }
+
+  get dim() {
+    return [this.width, this.height]
+  }
+
   get rowNames() {
     return this.DF$rowNames
   }
@@ -68,5 +88,10 @@ export default class Dataframe {
   // join(dataset, key){}
 
   // COPYING DATAFRAME
-  // copy(){}
+  copy() {
+    const columns = this.DF$columns.slice(0)
+    const rowNames = this.DF$rowNames.slice(0)
+    const columnNames = this.DF$columnNames.slice(0)
+    return new Dataframe({ columns, rowNames, columnNames })
+  }
 }
