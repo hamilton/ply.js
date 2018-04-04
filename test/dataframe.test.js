@@ -125,6 +125,8 @@ describe('appendRow', () => {
     const df = new Dataframe(data)
     df.appendRow([3, 'c'], 'Z')
     expect(df.rowNames).toEqual(['A', 'B', 'Z'])
+    expect(df.DF$columns[0]).toEqual([1, 2, 3])
+    expect(df.DF$columns[1]).toEqual(['a', 'b', 'c'])
   })
   it('appends a row if we pass in an object', () => {
     const df = new Dataframe(data)
@@ -159,10 +161,30 @@ describe('appendColumn', () => {
     const df = new Dataframe(data)
     df.appendColumn([100, 200])
     expect(df.columnNames).toEqual(['X', 'Y', 'x1'])
+    expect(df.DF$columns[df.DF$columns.length - 1]).toEqual([100, 200])
   })
-  it('appends a row with a label', () => {
+  it('appends a column with a label', () => {
     const df = new Dataframe(data)
-    df.appendColumn([3, 'c'], 'Z')
+    df.appendColumn([100, 200], 'Z')
     expect(df.columnNames).toEqual(['X', 'Y', 'Z'])
+    expect(df.DF$columns[df.DF$columns.length - 1]).toEqual([100, 200])
+  })
+})
+
+describe('get', () => {
+  const data = {
+    columns: [[1, 2], ['a', 'b']],
+    rowNames: ['A', 'B'],
+    columnNames: ['X', 'Y'],
+  }
+  const df = new Dataframe(data)
+  it('returns an error if out of bounds', () => {
+    expect(() => { df.get(100) }).toThrow()
+    expect(() => { df.get(2) }).toThrow()
+    expect(() => { df.get(-1) }).toThrow()
+  })
+  it('returns an error if a non-Number is passed in', () => {
+    expect(() => { df.get('a') }).toThrow()
+    expect(() => { df.get(new Date()) }).toThrow()
   })
 })

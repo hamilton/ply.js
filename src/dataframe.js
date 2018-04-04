@@ -38,6 +38,10 @@ export default class Dataframe {
     return this.DF$columnMap[columnName]
   }
 
+  //   constructRowObject(i) {
+  //     return this.DF$columns.forEach(c => [c[i]])
+  //   }
+
   // //////////////////////////////////////////////////////////////////////////////
 
   // STATIC METHODS
@@ -49,7 +53,6 @@ export default class Dataframe {
   // forEachRow(){}
 
   // CBIND
-
   appendRow(row, rowName) {
     if (!Array.isArray(row) && !isPlainObject(row)) { throw Error('appendRow must be an array or object') }
     if (Array.isArray(row)) {
@@ -78,7 +81,9 @@ export default class Dataframe {
 
   appendColumn(column, columnName) {
     if (!Array.isArray(column)) { throw Error('appendRow must be an array') }
-    if (column.length !== this.height) { throw Error(`new column length (${column.length}) not same as dataframe height (${this.height}) `) }
+    if (column.length !== this.height) {
+      throw Error(`new column length (${column.length}) not same as dataframe height (${this.height})`)
+    }
     this.DF$columns.push(column)
     let newColumnName = columnName
     if (columnName === undefined) {
@@ -91,7 +96,6 @@ export default class Dataframe {
   }
 
   // GETTERS / SETTERS
-
   get width() {
     return this.DF$columns.length
   }
@@ -135,6 +139,18 @@ export default class Dataframe {
 
   // BASIC getRow / getColumn functionality
   // get(i) {}
+  get(i) {
+    // return this.DF$columnNames.map(c => )
+    if (i >= this.height || i < 0) throw Error('get index is out of bounds')
+    if (!Number.isInteger(i)) throw Error('get index is not an Integer')
+    return this.DF$columnNames
+      .map(n => [n, this.DF$columnNames[this.getColumnMap(n)][i]])
+      .reduce((acc, v) => {
+        const [k, vi] = v
+        acc[k] = vi
+        return acc
+      }, {})
+  }
   // head(n) {}
   // tail(n) {}
 
@@ -151,6 +167,7 @@ export default class Dataframe {
   // join(dataset, key){}
 
   // COPYING DATAFRAME
+
   copy() {
     const columns = this.DF$columns.slice(0)
     const rowNames = this.DF$rowNames.slice(0)
