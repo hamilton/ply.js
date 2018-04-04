@@ -204,3 +204,30 @@ describe('get', () => {
     expect(row3).toEqual({ X: 3, Y: 'c', Z: 'cc' })
   })
 })
+
+describe('getColumn', () => {
+  const data = {
+    columns: [[1, 2, 3], ['a', 'b', 'c']],
+    rowNames: ['A', 'B', 'C'],
+    columnNames: ['X', 'Y'],
+  }
+  const df = new Dataframe(data)
+  it('rejects if the argument is not a valid string nor a number', () => {
+    expect(() => { df.getColumn(-1) }).toThrow()
+    expect(() => { df.getColumn(1000) }).toThrow()
+    expect(() => { df.getColumn('Z') }).toThrow()
+    expect(() => { df.getColumn(new Date()) }).toThrow()
+  })
+  it('pulls out the column by index', () => {
+    // const colByIndex = df.getColumn(0)
+    const colByName = df.getColumn('X')
+    // expect(colByIndex).toEqual(data.columns[0])
+    expect(colByName).toEqual(data.columns[0])
+  })
+  it('adequately deals with growing df', () => {
+    df.appendRow({ X: 4, Y: 'd' })
+    df.appendColumn(['aa', 'bb', 'cc', 'dd'], 'Z')
+    const col3Name = df.getColumn('Z')
+    expect(col3Name).toEqual(['aa', 'bb', 'cc', 'dd'])
+  })
+})

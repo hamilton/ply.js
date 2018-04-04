@@ -143,7 +143,7 @@ export default class Dataframe {
   // INDEXING / ITERATION
 
   // BASIC getRow / getColumn functionality
-  // get(i) {}
+
   get(i) {
     // return this.DF$columnNames.map(c => )
     if (i >= this.height || i < 0) throw Error('get index is out of bounds')
@@ -156,6 +156,29 @@ export default class Dataframe {
         return acc
       }, {})
   }
+
+  getColumn(name) {
+    let column
+    if (typeof name === 'string') {
+      const colIndex = this.getColumnMap(name)
+      if (colIndex === undefined) { throw Error('getColumn name not defined') }
+      column = this.DF$columns[colIndex]
+    } else {
+      throw Error('getColumn only takes a string representing a column name')
+    }
+    // if (Number.isInteger(indexOrName)) {
+    //   if (indexOrName > this.width || indexOrName < 0) throw Error('getColumn index out of bounds')
+    //   column = this.DF$columns[indexOrName]
+    // } else if (typeof indexOrName === 'string') {
+    //   const colIndex = this.getColumnMap(indexOrName)
+    //   if (colIndex === undefined) { throw Error('getColumn name not defined') }
+    //   column = this.DF$columns[colIndex]
+    // } else {
+    //   throw Error('getColumn only takes an index or a string representing a column name')
+    // }
+    return column
+  }
+
   // head(n) {}
   // tail(n) {}
 
