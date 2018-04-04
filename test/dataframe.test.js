@@ -96,12 +96,20 @@ describe('getters and setters', () => {
   })
 })
 
-
 describe('appendRow', () => {
-  const data = {
-    columns: [[1, 2], ['a', 'b']],
-    rowNames: ['A', 'B'],
+  let data
+
+  function resetData() {
+    data = {
+      columns: [[1, 2], ['a', 'b']],
+      rowNames: ['A', 'B'],
+    }
   }
+
+  beforeEach(() => {
+    resetData()
+  })
+
   it('throws an error if the row type is not accepted', () => {
     const df = new Dataframe(data)
     expect(() => { df.appendRow() }).toThrow()
@@ -113,6 +121,48 @@ describe('appendRow', () => {
     df.appendRow([3, 'c'])
     expect(df.rowNames).toEqual(['A', 'B', undefined])
   })
+  it('appends a row with a label', () => {
+    const df = new Dataframe(data)
+    df.appendRow([3, 'c'], 'Z')
+    expect(df.rowNames).toEqual(['A', 'B', 'Z'])
+  })
+  it('appends a row if we pass in an object', () => {
+    const df = new Dataframe(data)
+    df.appendRow({ A: 100, B: 'c' }, 'Z')
+    expect(df.rowNames).toEqual(['A', 'B', 'Z'])
+  })
+})
 
-  it('appends a row with a label', () => {})
+describe('appendColumn', () => {
+  let data
+
+  function resetData() {
+    data = {
+      columns: [[1, 2], ['a', 'b']],
+      rowNames: ['A', 'B'],
+      columnNames: ['X', 'Y'],
+    }
+  }
+
+  beforeEach(() => {
+    resetData()
+  })
+
+  it('throws an error if the row type is not accepted', () => {
+    const df = new Dataframe(data)
+    expect(() => { df.appendColumn() }).toThrow()
+    expect(() => { df.appendColumn('asodifn') }).toThrow()
+    expect(() => { df.appendColumn(new Date()) }).toThrow()
+    expect(() => { df.appendColumn({ A: 10, B: 10000 }) }).toThrow()
+  })
+  it('appends a new column and makes up a new variable if not named', () => {
+    const df = new Dataframe(data)
+    df.appendColumn([100, 200])
+    expect(df.columnNames).toEqual(['X', 'Y', 'x1'])
+  })
+  it('appends a row with a label', () => {
+    const df = new Dataframe(data)
+    df.appendColumn([3, 'c'], 'Z')
+    expect(df.columnNames).toEqual(['X', 'Y', 'Z'])
+  })
 })

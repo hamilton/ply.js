@@ -1,10 +1,16 @@
+function isPlainObject(obj) {
+  return typeof obj === 'object' && obj.constructor === Object
+}
+
 export default class Dataframe {
   // CONSTRUCTOR
   constructor(...args) {
     this.DF$columns = []
     this.DF$columnNames = []
     this.DF$rowNames = []
-    if (args.length && !(typeof args[0] === 'object' && args[0].constructor === Object)) {
+    this.DF$columnMap = {}
+    this.DF$usedColumnNames = 1
+    if (args.length && !(isPlainObject(args[0]))) {
       throw Error('Dataframe requires an object')
     }
     if (args.length === 1) {
@@ -16,10 +22,23 @@ export default class Dataframe {
         throw Error('Cannot have rowNames or columnNames without columns')
       }
       this.DF$columnNames = arg.columnNames || this.DF$columns.map((c, i) => i)
+      this.setColumnMap()
       this.DF$rowNames = arg.rowNames ||
         (this.DF$columns.length ? this.DF$columns[0].map((r, j) => j) : [])
     }
   }
+
+  // ////////////// PRIVATE-ISH METHODS used for internal logic. //////////////////
+  // NOTE: we better test these.
+  setColumnMap() {
+    this.DF$columnNames.forEach((c, i) => { this.DF$columnMap[c] = i })
+  }
+
+  getColumnMap(columnName) {
+    return this.DF$columnMap[columnName]
+  }
+
+  // //////////////////////////////////////////////////////////////////////////////
 
   // STATIC METHODS
   // static fromArrayOfObjects() {}
@@ -27,18 +46,49 @@ export default class Dataframe {
 
   // INTERATORS
   // eachColumn(){}
-  // eachRow(){}
+  // forEachRow(){}
 
   // CBIND
 
   appendRow(row, rowName) {
-    row.forEach((val, i) => {
-      this.DF$columns[i].push(val)
-    })
+    if (!Array.isArray(row) && !isPlainObject(row)) { throw Error('appendRow must be an array or object') }
+    if (Array.isArray(row)) {
+      row.forEach((val, i) => {
+        this.DF$columns[i].push(val)
+      })
+    } else if (isPlainObject(row)) {
+      Object.keys(row).forEach((k) => {
+        const v = row[k]
+        if (k in this.DF$columnNames) {
+          const index = this.getColumnMap(k)
+          this.DF$columns[index].push(v)
+        }
+      })
+      // make sure to append undefined values for keys that aren't there.
+      Object.keys(this.DF$columnNames)
+        .filter(col => !Object.keys(row).includes(col))
+        .forEach((col) => {
+          const index = this.getColumnMap(col)
+          this.DF$columns[index].push(undefined)
+        })
+    }
     this.DF$rowNames.push(rowName)
     return this
   }
-  // appendColumn(){}
+
+  appendColumn(column, columnName) {
+    if (!Array.isArray(column)) { throw Error('appendRow must be an array') }
+    if (column.length !== this.height) { throw Error(`new column length (${column.length}) not same as dataframe height (${this.height}) `) }
+    this.DF$columns.push(column)
+    let newColumnName = columnName
+    if (columnName === undefined) {
+      newColumnName = `x${this.DF$usedColumnNames}`
+      this.DF$usedColumnNames += 1
+    }
+    this.DF$columnNames.push(newColumnName)
+    this.setColumnMap()
+    return this
+  }
 
   // GETTERS / SETTERS
 
@@ -73,8 +123,21 @@ export default class Dataframe {
     if (!Array.isArray(names)) { throw Error('column names must be an array') }
     if (this.DF$columnNames.length !== names.length) { throw Error('column names must be same length') }
     this.DF$columnNames = names
+    this.DF$columnNameMap = {}
+    this.setColumnMap()
     return this
   }
+
+
+  // REPRESENTATION / TO STRING TYPE FUNCTIONS
+
+  // INDEXING / ITERATION
+
+  // BASIC getRow / getColumn functionality
+  // get(i) {}
+  // head(n) {}
+  // tail(n) {}
+
   // MANIPULATION STEPS
   // group(...args) {}
   // summarize(...args) {}
