@@ -302,3 +302,11 @@ export default class Dataframe {
 
 Dataframe.SEPARATOR = '||'
 
+Dataframe.fromObjects = (arrayOfObjects) => {
+  const columnNames = Object.keys(arrayOfObjects[0])
+  const df = new Dataframe({ columnNames, columns: columnNames.map(() => []) })
+  arrayOfObjects.forEach((r) => {
+    df.appendRow(columnNames.map(c => r[c]))
+  })
+  return df
+}
