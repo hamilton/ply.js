@@ -2,11 +2,29 @@ function isPlainObject(obj) {
   return typeof obj === 'object' && obj.constructor === Object
 }
 
+const STEPS = {
+  GROUP: 'group',
+  DATASET: 'dataset',
+}
+
 export default class Dataframe {
   // CONSTRUCTOR
   constructor(...args) {
+    // for ply operations.
+    this.DF$funcs = []
+    this.DF$facets = []
+    this.DF$step = STEPS.DATASET
+    // /
     this.DF$columns = []
     this.DF$columnNames = []
+
+    // NEED TESTS HERE. JESUS.
+    this.rowProxyHandler = {
+      get: (target, columnName) => {
+        if (typeof columnName === 'string') return target[this.getColumnMap(columnName)]
+        return target[columnName]
+      },
+    }
     this.DF$rowNames = []
     this.DF$columnMap = {}
     this.DF$usedColumnNames = 1
@@ -21,11 +39,16 @@ export default class Dataframe {
         (arg.columnNames && arg.columnNames.length))) {
         throw Error('Cannot have rowNames or columnNames without columns')
       }
-      this.DF$columnNames = arg.columnNames || this.DF$columns.map((c, i) => {
+      this.DF$columnNames = arg.columnNames || this.DF$columns.map(() => {
         const ki = `x${this.DF$usedColumnNames}`
         this.DF$usedColumnNames += 1
         return ki
       })
+
+      if (this.DF$columnNames.length !== this.DF$columns.length) {
+        throw Error('columnNames must be same length as columns')
+      }
+
       this.setColumnMap()
       this.DF$rowNames = arg.rowNames ||
         (this.DF$columns.length ? this.DF$columns[0].map((r, j) => j) : [])
@@ -42,10 +65,6 @@ export default class Dataframe {
     return this.DF$columnMap[columnName]
   }
 
-  //   constructRowObject(i) {
-  //     return this.DF$columns.forEach(c => [c[i]])
-  //   }
-
   // //////////////////////////////////////////////////////////////////////////////
 
   // STATIC METHODS
@@ -56,13 +75,49 @@ export default class Dataframe {
   // eachColumn(){}
   // forEachRow(){}
 
+  forEach(fcn) {
+    if (fcn && {}.toString.call(fcn) === '[object Function]') {
+      for (let i = 0; i < this.height; i++) {
+        fcn(this.get(i))
+      }
+    } else {
+      throw Error('argument is not a function')
+    }
+  }
+
+  forEachRow(fcn) {
+    if (fcn && {}.toString.call(fcn) === '[object Function]') {
+      for (let i = 0; i < this.height; i++) {
+        fcn(this.getRow(i), i)
+      }
+    } else {
+      throw Error('argument is not a function')
+    }
+  }
+
+  forEachColumn(fcn) {
+    this.DF$columnNames.forEach((c) => {
+      fcn(this.getColumn(c))
+    })
+  }
+
+  // * rows() {
+  //   for (let i = 0; i < this.height; i++) {
+  //     yield this.get(i)
+  //   }
+  // }
+
   // CBIND
   appendRow(row, rowName) {
     if (!Array.isArray(row) && !isPlainObject(row)) { throw Error('appendRow must be an array or object') }
     if (Array.isArray(row)) {
-      row.forEach((val, i) => {
-        this.DF$columns[i].push(val)
-      })
+      if (row.length === this.width) {
+        row.forEach((val, i) => {
+          this.DF$columns[i].push(val)
+        })
+      } else {
+        throw Error(`row (length ${row.length}) must be same width as data frame (${this.width})`)
+      }
     } else if (isPlainObject(row)) {
       Object.keys(row).forEach((k) => {
         const v = row[k]
@@ -78,14 +133,13 @@ export default class Dataframe {
           const index = this.getColumnMap(col)
           this.DF$columns[index].push(undefined)
         })
-      // console.log(this.DF$columnNames, this.DF$columns)
     }
     this.DF$rowNames.push(rowName)
     return this
   }
 
   appendColumn(column, columnName) {
-    if (!Array.isArray(column)) { throw Error('appendRow must be an array') }
+    if (!Array.isArray(column)) { throw Error('appendColumn first arg must be an array') }
     if (column.length !== this.height) {
       throw Error(`new column length (${column.length}) not same as dataframe height (${this.height})`)
     }
@@ -143,9 +197,8 @@ export default class Dataframe {
   // INDEXING / ITERATION
 
   // BASIC getRow / getColumn functionality
-
+  // this is getRow but not the pure version, returns an object.
   get(i) {
-    // return this.DF$columnNames.map(c => )
     if (i >= this.height || i < 0) throw Error('get index is out of bounds')
     if (!Number.isInteger(i)) throw Error('get index is not an Integer')
     return this.DF$columnNames
@@ -157,6 +210,21 @@ export default class Dataframe {
       }, {})
   }
 
+  // is this how it works?
+  * rows() {
+    for (let i = 0; i < this.height; i++) {
+      yield this.getRow(i)
+    }
+  }
+
+  getRow(i) {
+    return new Proxy(
+      this.DF$columnNames.map(n => this.DF$columns[this.getColumnMap(n)][i]),
+      this.rowProxyHandler,
+    )
+    // return this.DF$columnNames.map(n => this.DF$columns[this.getColumnMap(n)][i])
+  }
+
   getColumn(name) {
     let column
     if (typeof name === 'string') {
@@ -166,24 +234,52 @@ export default class Dataframe {
     } else {
       throw Error('getColumn only takes a string representing a column name')
     }
-    // if (Number.isInteger(indexOrName)) {
-    //   if (indexOrName > this.width || indexOrName < 0) throw Error('getColumn index out of bounds')
-    //   column = this.DF$columns[indexOrName]
-    // } else if (typeof indexOrName === 'string') {
-    //   const colIndex = this.getColumnMap(indexOrName)
-    //   if (colIndex === undefined) { throw Error('getColumn name not defined') }
-    //   column = this.DF$columns[colIndex]
-    // } else {
-    //   throw Error('getColumn only takes an index or a string representing a column name')
-    // }
     return column
   }
 
-  // head(n) {}
+  // NEEDS TESTS.
+  head(n) {
+    const out = []
+    for (let i = 0; i < n; i++) {
+      out.push(this.get(i))
+    }
+    return out
+  }
   // tail(n) {}
 
   // MANIPULATION STEPS
-  // group(...args) {}
+  group(...f) {
+    f.forEach((fi) => {
+      if (!this.DF$columnNames.includes(fi)) throw Error(`facet ${fi} not in columns`)
+    })
+    const gr = {}
+    this.forEachRow((v, i) => {
+      const facet = f.map(fi => v[fi]).join(Dataframe.SEPARATOR)
+      if (!(facet in gr)) gr[facet] = []
+      gr[facet].push(i)
+    })
+    this.DF$grouping = gr
+    this.DF$facets = f
+    this.DF$step = STEPS.GROUP
+    return this
+  }
+
+  summarize(fcns) {
+    // for each chunk of a data set, create the thing, and then run all the functions over it
+    // to get a new row of data. gross.
+    const columnNames = Object.keys(fcns)
+    const outColumns = [...columnNames, 'facets']
+    const newDF = new Dataframe({
+      columns: outColumns.map(() => []),
+      columnNames: outColumns,
+    })
+    Object.keys(this.DF$grouping).forEach((gr) => {
+      const subset = this.DF$grouping[gr].map(i => this.getRow(i))
+      newDF.appendRow([...columnNames.map(cn => fcns[cn](subset)), gr])
+    })
+    return newDF
+  }
+
   // summarize(...args) {}
   // filter(){}
   // gather(){}
@@ -203,3 +299,6 @@ export default class Dataframe {
     return new Dataframe({ columns, rowNames, columnNames })
   }
 }
+
+Dataframe.SEPARATOR = '||'
+

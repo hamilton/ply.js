@@ -45,6 +45,14 @@ describe('Dataframe constructor', () => {
     expect(() => new Dataframe({ rowNames: ['A1', 'A2', 'A3', 'A4'] })).toThrow()
     expect(() => new Dataframe({ columnNames: ['count', 'label'] })).toThrow()
   })
+  it('throws if columnNames is not the same length as columns', () => {
+    const data = {
+      columns: [[1, 2, 3, 4], ['a', 'b', 'c', 'd']],
+      rowNames: ['A1', 'A2', 'A3', 'A4'],
+      columnNames: ['count'],
+    }
+    expect(() => new Dataframe(data)).toThrow()
+  })
 })
 
 describe('getters and setters', () => {
@@ -231,3 +239,94 @@ describe('getColumn', () => {
     expect(col3Name).toEqual(['aa', 'bb', 'cc', 'dd'])
   })
 })
+
+describe('forEach', () => {
+  const data = {
+    columns: [[1, 2, 3], ['a', 'b', 'c']],
+    rowNames: ['A', 'B', 'C'],
+    columnNames: ['X', 'Y'],
+  }
+  const df = new Dataframe(data)
+  it('throws an error when you do not pass in a function', () => {
+    expect(() => df.forEach('test')).toThrow('not a function')
+    expect(() => df.forEach(new Date())).toThrow()
+    expect(() => df.forEach()).toThrow()
+  })
+  it('interates through forEach giving a row-based representation', () => {
+
+  })
+})
+
+
+const RUN_PERF = false
+
+if (RUN_PERF) {
+  const VOL = 10000000
+  const df1 = new Dataframe({ columns: [[-1, -1]], columnNames: ['a'] })
+  const L1 = 'appendRow with array - one column'
+  console.time(L1)
+
+  for (let i = 0; i < VOL; i++) {
+    df1.appendRow([0])
+  }
+
+  console.timeEnd(L1)
+
+  const df2 = new Dataframe({ columns: [['x'], ['x'], ['x'], ['x'], ['x'], ['x'], ['x'], ['x'], ['x'], ['x']], columnNames: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'] })
+  const L2 = 'appendRow with array - ten columns, strings'
+  console.time(L2)
+
+  for (let i = 0; i < VOL; i++) {
+    df2.appendRow(['x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x', 'x'])
+  }
+
+  console.timeEnd(L2)
+  const df3 = new Dataframe({ columns: [['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01']], columnNames: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'] })
+  const L3 = 'appendRow with array - ten columns, date string'
+  console.time(L3)
+
+  for (let i = 0; i < VOL; i++) {
+    df3.appendRow(['2010-01-01', '2010-01-01', '2010-01-01', '2010-01-01', '2010-01-01', '2010-01-01', '2010-01-01', '2010-01-01', '2010-01-01', '2010-01-01'])
+  }
+
+  console.timeEnd(L3)
+
+  const df4 = new Dataframe({ columns: [['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01'], ['2010-01-01']], columnNames: ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j'] })
+  const L4 = '10x size appendRow with array - ten columns, date string'
+  console.time(L4)
+
+  for (let i = 0; i < VOL; i++) {
+    df4.appendRow([
+      '2010-01-01',
+      '2010-01-01',
+      '2010-01-01',
+      '2010-01-01',
+      '2010-01-01',
+      '2010-01-01',
+      '2010-01-01',
+      '2010-01-01',
+      '2010-01-01',
+      '2010-01-01'])
+  }
+  console.timeEnd(L4)
+
+  const MAX_LENGTH = VOL
+  const a = new Int32Array(MAX_LENGTH)
+  const L5 = 'int32 array expansion'
+  console.time(L5)
+
+  for (let i = 0; i < VOL; i++) {
+    a[i] = i
+  }
+
+  console.timeEnd(L5)
+
+  // const L6 = 'int32 array slicing'
+
+  // console.time(L6)
+  // for (let i = 0; i < 10000000; i++) {
+  //   a.slice(0, 100)
+  // }
+
+  // console.timeEnd(L6)
+}
