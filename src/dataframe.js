@@ -101,13 +101,6 @@ export default class Dataframe {
     })
   }
 
-  // * rows() {
-  //   for (let i = 0; i < this.height; i++) {
-  //     yield this.get(i)
-  //   }
-  // }
-
-  // CBIND
   appendRow(row, rowName) {
     if (!Array.isArray(row) && !isPlainObject(row)) { throw Error('appendRow must be an array or object') }
     if (Array.isArray(row)) {
@@ -270,10 +263,6 @@ export default class Dataframe {
   }
 
   summarize(fcns) {
-    // for each chunk of a data set, create the thing, and then run all the functions over it
-    // to get a new row of data. gross.
-    // what about if we're not in this step?
-    // one big group?
     const columnNames = Object.keys(fcns)
     const outColumns = columnNames.slice()
     if (this.DF$step === STEPS.GROUP) outColumns.push('facets')
@@ -316,13 +305,14 @@ export default class Dataframe {
 
 Dataframe.SEPARATOR = '||'
 
-Dataframe.fromObjects = (arrayOfObjects) => {
+Dataframe.from = (arrayOfObjects) => {
+  // this takes either an array of objects, or an array of arrays.
   if (!Array.isArray(arrayOfObjects)) throw new Error('argument is not an array')
   const columnNames = Object.keys(arrayOfObjects[0])
   const df = new Dataframe({ columnNames, columns: columnNames.map(() => []) })
   arrayOfObjects.forEach((r, i) => {
     if (!(isPlainObject(r))) throw new Error(`row ${i} is not an object`)
-    df.appendRow(columnNames.map(c => r[c]))
+    df.appendRow(r)
   })
   return df
 }

@@ -13,7 +13,7 @@ const ds2 = [
 
 describe('fromObjects', () => {
   it('creates a Dataframe from an array of objects', () => {
-    const data = Dataframe.fromObjects(ds2)
+    const data = Dataframe.from(ds2)
     expect(data.DF$columns).toEqual([
       ['h', 'h', 'i', 'i', 'h', 'h', 'i', 'i'],
       ['a', 'a', 'a', 'a', 'b', 'b', 'b', 'b'],
@@ -24,7 +24,7 @@ describe('fromObjects', () => {
     expect(data.width).toBe(3)
   })
   it('rejects non-arrayOfObjects', () => {
-    expect(() => Dataframe.fromObjects([[{ a: 10 }, { b: 20 }]])).toThrow()
-    expect(() => Dataframe.fromObjects('test')).toThrow()
+    expect(() => Dataframe.from([[{ a: 10 }, { b: 20 }]])).toThrow()
+    expect(() => Dataframe.from('test')).toThrow()
   })
 })
