@@ -240,6 +240,19 @@ describe('getColumn', () => {
   })
 })
 
+describe('getRow', () => {
+  // now wat.
+  const data = {
+    columns: [[1, 2, 3], ['a', 'b', 'c']],
+    rowNames: ['A', 'B', 'C'],
+    columnNames: ['X', 'Y'],
+  }
+  const df = new Dataframe(data)
+  const r1 = df.getRow(1)
+  expect(r1[0]).toBe(r1.X)
+  expect(r1[1]).toBe(r1.Y)
+})
+
 describe('forEach', () => {
   const data = {
     columns: [[1, 2, 3], ['a', 'b', 'c']],

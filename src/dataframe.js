@@ -21,8 +21,11 @@ export default class Dataframe {
     // NEED TESTS HERE. JESUS.
     this.rowProxyHandler = {
       get: (target, columnName) => {
-        if (typeof columnName === 'string') return target[this.getColumnMap(columnName)]
-        return target[columnName]
+        // console.log(target, columnName)
+        if (typeof columnName === 'symbol') return target
+        const colnum = parseInt(columnName, 10)
+        if (Number.isNaN(colnum)) return target[this.getColumnMap(columnName)]
+        return target[colnum]
       },
     }
     this.DF$rowNames = []
