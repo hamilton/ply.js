@@ -248,6 +248,12 @@ export default class Dataframe {
 
   // MANIPULATION STEPS
   group(...f) {
+    if (!f.length) {
+      this.DF$grouping = undefined
+      this.DF$facets = undefined
+      this.DF$step = STEPS.DATASET
+      return this
+    }
     f.forEach((fi) => {
       if (!this.DF$columnNames.includes(fi)) throw Error(`facet ${fi} not in columns`)
     })

@@ -23,7 +23,10 @@ describe('group', () => {
     expect(ds.DF$grouping).toEqual({
       'x||a': [0, 4, 8], 'x||b': [2, 6, 10], 'y||a': [1, 5, 9], 'y||b': [3, 7, 11],
     })
-    // ds.group() // reset
+    ds.group()
+    expect(ds.DF$grouping).toBe(undefined)
+    expect(ds.DF$facets).toBe(undefined)
+    expect(ds.DF$step).toBe('dataset')
   })
   it('rejects incorrect groupings if they do not exist', () => {
     expect(() => ds.group('w')).toThrow()
