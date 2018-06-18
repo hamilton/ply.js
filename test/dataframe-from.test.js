@@ -23,4 +23,8 @@ describe('fromObjects', () => {
     expect(data.height).toBe(8)
     expect(data.width).toBe(3)
   })
+  it('rejects non-arrayOfObjects', () => {
+    expect(() => Dataframe.fromObjects([[{ a: 10 }, { b: 20 }]])).toThrow()
+    expect(() => Dataframe.fromObjects('test')).toThrow()
+  })
 })

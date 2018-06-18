@@ -37,6 +37,8 @@ describe('summarize', () => {
     expect(output1.DF$columns).toEqual([[6, 6], [0, 0], ['x', 'y']])
     const output2 = ds.group('z', 'd').summarize(transforms)
     expect(output2.DF$columns).toEqual([[3, 3, 3, 3], [1, 1, -1, -1], ['x||a', 'y||a', 'x||b', 'y||b']])
+    const output3 = new Dataframe(dfContents).summarize(transforms)
+    expect(output3.DF$columns).toEqual([[12], [0]])
   })
   it('rejects invalid summary functions or values', () => {
 

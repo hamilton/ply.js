@@ -191,7 +191,6 @@ export default class Dataframe {
     return this
   }
 
-
   // REPRESENTATION / TO STRING TYPE FUNCTIONS
 
   // INDEXING / ITERATION
@@ -267,20 +266,29 @@ export default class Dataframe {
   summarize(fcns) {
     // for each chunk of a data set, create the thing, and then run all the functions over it
     // to get a new row of data. gross.
+    // what about if we're not in this step?
+    // one big group?
     const columnNames = Object.keys(fcns)
-    const outColumns = [...columnNames, 'facets']
+    const outColumns = columnNames.slice()
+    if (this.DF$step === STEPS.GROUP) outColumns.push('facets')
     const newDF = new Dataframe({
       columns: outColumns.map(() => []),
       columnNames: outColumns,
     })
-    Object.keys(this.DF$grouping).forEach((gr) => {
-      const subset = this.DF$grouping[gr].map(i => this.getRow(i))
-      newDF.appendRow([...columnNames.map(cn => fcns[cn](subset)), gr])
-    })
+    if (this.DF$step === STEPS.DATASET) {
+      const input = []
+      this.forEachRow((row) => { input.push(row) })
+      newDF.appendRow([...columnNames.map(cn => fcns[cn](input))])
+    } else {
+      Object.keys(this.DF$grouping).forEach((gr) => {
+        const subset = this.DF$grouping[gr].map(i => this.getRow(i))
+        newDF.appendRow([...columnNames.map(cn => fcns[cn](subset)), gr])
+      })
+    }
+    this.DF$step = STEPS.DATASET
     return newDF
   }
 
-  // summarize(...args) {}
   // filter(){}
   // gather(){}
   // spread(){}
@@ -303,9 +311,11 @@ export default class Dataframe {
 Dataframe.SEPARATOR = '||'
 
 Dataframe.fromObjects = (arrayOfObjects) => {
+  if (!Array.isArray(arrayOfObjects)) throw new Error('argument is not an array')
   const columnNames = Object.keys(arrayOfObjects[0])
   const df = new Dataframe({ columnNames, columns: columnNames.map(() => []) })
-  arrayOfObjects.forEach((r) => {
+  arrayOfObjects.forEach((r, i) => {
+    if (!(isPlainObject(r))) throw new Error(`row ${i} is not an object`)
     df.appendRow(columnNames.map(c => r[c]))
   })
   return df
