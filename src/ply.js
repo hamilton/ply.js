@@ -170,14 +170,6 @@ Ply.correlation = (fieldX, fieldY) => (arr) => {
   return covXY / (sX * sY)
 }
 
-// Ply.rank 
-const r = (a,b) => b-a
-
-const imap = (acc, item, ind) => {
-  acc[item] = index
-  return acc
-}
-
 export const rank = (field) => (arr) => {
   let rankIndex = arr.slice().map((d,i) => [d[field], i])
   rankIndex.sort((a,b) => a[0] - b[0])
