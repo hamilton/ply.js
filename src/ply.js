@@ -6,7 +6,6 @@ const STEPS = {
 class Ply {
   constructor(data) {
     if (!Array.isArray(data)) throw new Error('data must be an array')
-    // I guess this isn't a lot of objects to try. Let's go for it.
     data.forEach((d) => {
       if (!(typeof d === 'object' && d.constructor === Object)) throw Error('data must be an array of objects')
     })
@@ -126,6 +125,7 @@ Ply.mean = field => (arr) => {
 }
 
 Ply.variance = field => (arr) => {
+  // Welford's online algorithm
   const n = arr.length
   if (n < 2) return 0
   let M = arr[0][field]
@@ -143,6 +143,32 @@ Ply.variance = field => (arr) => {
 }
 
 Ply.standardDeviation = field => arr => Math.sqrt(Ply.variance(field)(arr))
+
+Ply.covariance = (fieldX, fieldY) => (arr) => {
+  let meanX = 0
+  let meanY = 0
+  let C = 0
+  const N = arr.length
+  if (N < 2) return 0
+  arr.forEach((d, i) => {
+    const n = i + 1
+    const x = d[fieldX]
+    const y = d[fieldY]
+    const dx = x - meanX
+    meanX += dx / n
+    meanY += (y - meanY) / n
+    C += dx * (y - meanY)
+  })
+  return C / (N - 1)
+}
+
+Ply.correlation = (fieldX, fieldY) => (arr) => {
+  if (arr.length <= 1) return NaN
+  let covXY = Ply.covariance(fieldX, fieldY)(arr)
+  let sX = Ply.standardDeviation(fieldX)(arr)
+  let sY = Ply.standardDeviation(fieldY)(arr)
+  return covXY / (sX * sY)
+}
 
 Ply.max = field => (arr) => {
   if (arr === undefined || !arr.length) return -Infinity

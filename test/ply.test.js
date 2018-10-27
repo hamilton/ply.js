@@ -317,6 +317,34 @@ describe('Ply.min', () => {
   })
 })
 
+
+const xCov = [
+  { x: 5.5, y: 6.7 },
+  { x: 4.4, y: 15.3 },
+  { x: 9.0, y: 3.3 },
+  { x: 25.3, y: 59.6 },
+  { x: 22.4, y: 15.0 },
+]
+const cov = Ply.covariance('x', 'y')
+describe('Ply.covariance', () => {
+  it('returns 0 if data.length < 2', () => {
+    expect(cov(toDS([10]))).toBe(0)
+  })
+  it('calculates the covariance', () => {
+    expect(cov(xCov)).toBeCloseTo(161.7705)
+  })
+})
+
+const cor = Ply.correlation('x', 'y')
+describe('Ply.correlation', () => {
+  it('returns NaN if length < 2', () => {
+    expect(cor(xCov.slice(0, 1))).toBe(NaN)
+  })
+  it('calculates the correlation coefficient', () => {
+    expect(cor(xCov)).toBeCloseTo(0.724355)
+  })
+})
+
 const xs = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
 const ys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 describe('Ply.quantile', () => {
