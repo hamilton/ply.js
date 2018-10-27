@@ -170,6 +170,37 @@ Ply.correlation = (fieldX, fieldY) => (arr) => {
   return covXY / (sX * sY)
 }
 
+// Ply.rank 
+const r = (a,b) => b-a
+
+const imap = (acc, item, ind) => {
+  acc[item] = index
+  return acc
+}
+
+export const rank = (field) => (arr) => {
+  let rankIndex = arr.slice().map((d,i) => [d[field], i])
+  rankIndex.sort((a,b) => a[0] - b[0])
+  let c = 0
+  rankIndex = rankIndex.reduceRight((a, x, ind) => {
+      a[x[1]] = ind+1
+      return a
+    }, {})
+  return arr.map((_, i) => rankIndex[i])
+}
+
+Ply.spearman = (fieldX, fieldY) => (arr) => {
+  let rX = rank(fieldX)(arr)
+  let rY = rank(fieldY)(arr)
+  let newArr = rX.map((d,i) => {
+    return {
+      x: d,
+      y: rY[i]
+    }
+  })
+  return Ply.correlation('x', 'y')(newArr)
+}
+
 Ply.max = field => (arr) => {
   if (arr === undefined || !arr.length) return -Infinity
   return Math.max(...arr.map(d => d[field]))

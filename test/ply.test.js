@@ -1,4 +1,4 @@
-import Ply from '../src/ply'
+import Ply, { rank } from '../src/ply'
 
 const ds1 = [
   {
@@ -342,6 +342,27 @@ describe('Ply.correlation', () => {
   })
   it('calculates the correlation coefficient', () => {
     expect(cor(xCov)).toBeCloseTo(0.724355)
+  })
+})
+
+const xRank = [
+  { x: 5.5, y: 10.10 }, // 2
+  { x: 5.5, y: 12.53 }, // 3
+  { x: 9.2, y: 9.5 }, // 4
+  { x: 3.5, y: 20.43 }, // 1
+  { x: 20.20, y: 1.4 }, // 5
+]
+
+const rx = rank('x')
+describe('{rank}', () => {
+  it('does the rank', () => {
+    expect(rx(xRank)).toEqual([2, 3, 4, 1, 5])
+  })
+})
+const spearman = Ply.spearman('x', 'y')
+describe('Ply.spearman', () => {
+  it('computes rho', () => {
+    expect(spearman(xCov)).toBeCloseTo(0.3)
   })
 })
 
