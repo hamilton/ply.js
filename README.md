@@ -27,7 +27,7 @@ let sd = new Ply(data)
 
 ### group a small data set and sum / count the values.
 
-```
+```javascript
 let data = [
     {date: '2010-01-02', color: 'green', x: 100},
     {date: '2010-01-02', color: 'green', x: 120},
@@ -55,7 +55,7 @@ let byColorAndDate = new Ply(data)
 
 Here, we use some [reducer helper functions](#reducer-helper-functions) to get summary statistics of our group.
 
-```
+```javascript
 let data = [
     {date: '2018-01-02', color: 'green', x: 100},
     {date: '2018-01-02', color: 'green', x: 120},
