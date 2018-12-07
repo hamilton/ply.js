@@ -68,33 +68,9 @@ export const ds4 = [
   { x: 'b', y: 200 },
 ]
 
-// test data for join functionality
-
 export const ds5 = [
-  { x: 'a', y: 1 },
-  { x: 'b', y: 2 },
-  { x: 'c', y: 3 },
-  { x: 'd', y: 4 },
-]
-
-export const ds6 = [
-  { x: 'a', z: 100 },
-  { x: 'b', z: 101 },
-  { x: 'c', z: 102 },
-  { x: 'd', z: 103 },
-]
-
-
-export const ds7 = [
-  { x: 'a', z: 100 },
-  { x: 'a', z: 101 },
-  { x: 'c', z: 102 },
-  { x: 'd', z: 103 },
-]
-
-export const ds8 = [
-  { x: 'a', z: 100 },
-  { x: 'a', z: 101 },
-  { x: 'c', z: 102 },
-  { x: 'e', z: 103 },
+  { x: 'a', z: 10 },
+  { x: 'c', z: 101 },
+  { x: 'b', z: 20 },
+  { x: 'd', z: 100 },
 ]

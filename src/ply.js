@@ -37,6 +37,16 @@ class Ply {
     return this
   }
 
+  sort(comparisonFunction) {
+    if (typeof comparisonFunction !== 'function') throw Error(`sort requires a comparison function. Received a ${typeof comparisonFunction}`)
+    this.funcs.push((data) => {
+      const newData = data.slice()
+      newData.sort(comparisonFunction)
+      return newData
+    })
+    return this
+  }
+
   select(...fields) {
     if (!fields.length) throw Error('must add at least one field to select')
     this.funcs.push((data) => {

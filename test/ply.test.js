@@ -1,8 +1,5 @@
 import Ply from '../src/ply'
-import {
-  ds1, ds2, ds3, ds4, ds5, ds6,
-  ds7, sameArrayContents,
-} from './test-data'
+import { ds1, ds2, ds3, ds4, ds5, sameArrayContents } from './test-data'
 
 
 describe('input error handling', () => {
@@ -184,6 +181,20 @@ describe('select', () => {
   it('removes vars from a df by a function operating on fields returning truthy or falsy values', () => {
     const test = new Ply(ds1).select(field => field.toLowerCase() > 'v').transform()
     expect(Object.keys(test[0]).length).toBe(4)
+  })
+})
+
+describe('sort', () => {
+  it('throws if you pass a non-function', () => {
+    expect(() => new Ply(ds5).sort('whatever!').transform()).toThrow()
+  })
+  it('sorts', () => {
+    const test = new Ply(ds5).sort((a, b) => a.x > b.x).transform()
+    expect(test.length).toBe(ds5.length)
+    expect(test[0]).toEqual({ x: 'a', z: 10 })
+    expect(test[1]).toEqual({ x: 'b', z: 20 })
+    expect(test[2]).toEqual({ x: 'c', z: 101 })
+    expect(test[3]).toEqual({ x: 'd', z: 100 })
   })
 })
 
