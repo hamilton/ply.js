@@ -88,6 +88,7 @@ let summary = new Ply(data)
 - __`.group(...facets)`__ Creates a new grouped data set based on the facet keys. The resulting object has keys based on the facet combinations, and values which are the row elements that contain those facets.
 - __`.reduce({...newVariableFunctions})`__ - reduces a group data set and outputs new variables based on the argument passed.
 - __`.map(mapFunction)`__ - functions just like the array `map` function, but works on both grouped and ungrouped Plys.
+- __`.select(fieldsOrSelectFunction)`__ - selects columns from a Ply object.
 
 ### reducer helper functions
 
@@ -124,6 +125,9 @@ let mean = Ply.mean('x')(data)
 - __`Ply.mean(key)`__ returns the mean.
 - __`Ply.variance(key)`__ returns the variance, calculated via Welford's method.
 - __`Ply.standardDeviation(key)`__ returns the standard deviation.
+- __`Ply.covariance(key1, key2)`__ returns the covariance.
+- __`Ply.correlation(key1, key2)`__ returns the correlation.
+- __`Ply.spearmanz(key1, key2)`__ returns the [spearman correlation coefficient](https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient).
 - __`Ply.quantile(q, key)`__ returns the value at quantile `q`.
 - __`Ply.median(key)`__ shorthand for `Ply.quantile(.5, key)`.
 - __`Ply.IQR(key)`__ returns the inter-quartile range.
