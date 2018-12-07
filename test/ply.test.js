@@ -197,19 +197,3 @@ describe('sort', () => {
     expect(test[3]).toEqual({ x: 'd', z: 100 })
   })
 })
-
-// describe('joining', () => {
-//   it('throws for mis-matched sizes in join', () => {
-//     const test = new Ply(ds5).join(ds1, 'x')
-//     expect(() => test.transform()).toThrow()
-//   })
-//   it('throws for non-unique keys in join', () => {
-//     const test = new Ply(ds5).join(ds7, 'x')
-//     expect(() => test.transform()).toThrow()
-//   })
-//   it('.join matches perfectly two key-for-key datasets', () => {
-//     const test = new Ply(ds5).join(ds6, 'x').transform()
-//     expect(test.length).toBe(4)
-//     expect(Object.keys(test[0]).length).toBe(3)
-//   })
-// })
