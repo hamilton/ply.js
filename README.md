@@ -127,7 +127,7 @@ let mean = Ply.mean('x')(data)
 - __`Ply.standardDeviation(key)`__ returns the standard deviation.
 - __`Ply.covariance(key1, key2)`__ returns the covariance.
 - __`Ply.correlation(key1, key2)`__ returns the correlation.
-- __`Ply.spearmanz(key1, key2)`__ returns the [spearman correlation coefficient](https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient).
+- __`Ply.spearman(key1, key2)`__ returns the [spearman correlation coefficient](https://en.wikipedia.org/wiki/Spearman%27s_rank_correlation_coefficient).
 - __`Ply.quantile(q, key)`__ returns the value at quantile `q`.
 - __`Ply.median(key)`__ shorthand for `Ply.quantile(.5, key)`.
 - __`Ply.IQR(key)`__ returns the inter-quartile range.
