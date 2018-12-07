@@ -37,6 +37,25 @@ class Ply {
     return this
   }
 
+  select(...fields) {
+    if (!fields.length) throw Error('must add at least one field to select')
+    this.funcs.push((data) => {
+      fields.forEach((f) => {
+        if (typeof f !== 'function' && typeof f !== 'string' && typeof f !== 'number') throw Error(`field type must be string or number, but found ${typeof f}`)
+      })
+      const filterField = fields.length === 1 && typeof fields[0] === 'function' ?
+        df => fields[0](df)
+        : df => fields.includes(df)
+      return data.map(d => Object.keys(d)
+        .filter(filterField)
+        .reduce((acc, f) => {
+          acc[f] = d[f]
+          return acc
+        }, {}))
+    })
+    return this
+  }
+
   group(...f) {
     this.funcs.push(data => data.reduce((o, v) => {
       const facet = f.map(fi => v[fi]).join(Ply.SEPARATOR)

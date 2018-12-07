@@ -1,5 +1,8 @@
 import Ply from '../src/ply'
-import { ds1, ds2, ds3, ds4, sameArrayContents } from './test-data'
+import {
+  ds1, ds2, ds3, ds4, ds5, ds6,
+  ds7, sameArrayContents,
+} from './test-data'
 
 
 describe('input error handling', () => {
@@ -162,3 +165,40 @@ describe('clearing a Ply object', () => {
     expect(out2).not.toEqual(out4)
   })
 })
+
+describe('select', () => {
+  it('throws for weird or bad values', () => {
+    expect(() => new Ply(ds1).select().transform()).toThrow()
+    expect(() => new Ply(ds1).select([1, 2, 3, 4, 5]).transform()).toThrow()
+  })
+  it('gracefully removes vars from a df by collection of strings', () => {
+    const test = new Ply(ds1).select('u', 'v', 'z').transform()
+    expect(test.length).toBe(ds1.length)
+    test.forEach((d, i) => {
+      expect(Object.keys(d).length).toBe(3)
+      Object.keys(d).forEach((f) => {
+        expect(d[f]).toBe(ds1[i][f])
+      })
+    })
+  })
+  it('removes vars from a df by a function operating on fields returning truthy or falsy values', () => {
+    const test = new Ply(ds1).select(field => field.toLowerCase() > 'v').transform()
+    expect(Object.keys(test[0]).length).toBe(4)
+  })
+})
+
+// describe('joining', () => {
+//   it('throws for mis-matched sizes in join', () => {
+//     const test = new Ply(ds5).join(ds1, 'x')
+//     expect(() => test.transform()).toThrow()
+//   })
+//   it('throws for non-unique keys in join', () => {
+//     const test = new Ply(ds5).join(ds7, 'x')
+//     expect(() => test.transform()).toThrow()
+//   })
+//   it('.join matches perfectly two key-for-key datasets', () => {
+//     const test = new Ply(ds5).join(ds6, 'x').transform()
+//     expect(test.length).toBe(4)
+//     expect(Object.keys(test[0]).length).toBe(3)
+//   })
+// })
