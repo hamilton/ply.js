@@ -96,7 +96,7 @@ All the reducer helper functions return a _function_ that takes an array, pulls 
 
 Here's how they look in practice:
 
-```
+```javascript
 let data = [
 	{facet: 'a', x: 10},
     {facet: 'b', x: 15},
@@ -115,7 +115,7 @@ let out = ply
 
 Alternatively, you can just use them directly.
 
-```
+```javascript
 let mean = Ply.mean('x')(data)
 ```
 
