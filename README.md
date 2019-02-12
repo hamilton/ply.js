@@ -2,7 +2,7 @@
 
 [![Build Status](https://travis-ci.org/hamilton/ply.js.svg?branch=master)](https://travis-ci.org/hamilton/ply.js/)
 
-`ply.js` is a small javascript library designed to to group, summarize, and manipulate tabular data sets, using an API inspired by Hadley Wickham's [dplyr](http://dplyr.tidyverse.org/) library for R.
+`ply.js` is a small javascript library designed to to group, summarize, and manipulate tabular data sets, using an API inspired by Hadley Wickham's [dplyr](http://dplyr.tidyverse.org/) library for R. It's meant to work in browsers with the kind of tabular data you might encounter on the web - arrays of objects.
 
 Here's an example:
 
