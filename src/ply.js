@@ -40,7 +40,7 @@ class Ply {
   sort(comparisonFunction) {
     if (typeof comparisonFunction !== 'function') throw Error(`sort requires a comparison function. Received a ${typeof comparisonFunction}`)
     this.funcs.push((data) => {
-      const newData = data.slice()
+      const newData = [...data]
       newData.sort(comparisonFunction)
       return newData
     })
@@ -99,6 +99,29 @@ class Ply {
       throw TypeError('cannot filter on a grouped data set')
     }
     this.funcs.push(data => data.filter(fcn))
+    return this
+  }
+
+  gather(keyName, valueName, ...inputColumns) {
+    if (typeof keyName !== 'string' || typeof valueName !== 'string') {
+      throw new Error('must include key name and value name')
+    }
+    this.funcs.push((data) => {
+      const out = []
+      data.forEach((row) => {
+        inputColumns.forEach((inputColumnName) => {
+          const newRow = {}
+          newRow[keyName] = inputColumnName
+          newRow[valueName] = row[inputColumnName]
+          const keys = Object.keys(row).filter(f => !inputColumns.includes(f))
+          keys.forEach((key) => {
+            newRow[key] = row[key]
+          })
+          out.push(newRow)
+        })
+      })
+      return out
+    })
     return this
   }
 

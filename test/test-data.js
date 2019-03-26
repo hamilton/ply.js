@@ -74,3 +74,12 @@ export const ds5 = [
   { x: 'b', z: 20 },
   { x: 'd', z: 100 },
 ]
+
+export const ds6 = [
+  {
+    length: 10, width: 20, x: 10, y: 20,
+  },
+  {
+    length: 5, width: 10, x: 1, y: 2,
+  },
+]
