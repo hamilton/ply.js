@@ -1,5 +1,5 @@
 import Ply from '../src/ply'
-import { ds1, ds2, ds3, ds4, ds5, sameArrayContents } from './test-data'
+import { ds1, ds2, ds3, ds4, ds5, ds6, sameArrayContents } from './test-data'
 
 
 describe('input error handling', () => {
@@ -189,11 +189,39 @@ describe('sort', () => {
     expect(() => new Ply(ds5).sort('whatever!').transform()).toThrow()
   })
   it('sorts', () => {
-    const test = new Ply(ds5).sort((a, b) => a.x > b.x).transform()
+    const test = new Ply(ds5).sort((a, b) => {
+      if (a.x > b.x) return 1
+      else if (a.x < b.x) return -1
+      return 0
+    }).transform()
+
     expect(test.length).toBe(ds5.length)
     expect(test[0]).toEqual({ x: 'a', z: 10 })
     expect(test[1]).toEqual({ x: 'b', z: 20 })
     expect(test[2]).toEqual({ x: 'c', z: 101 })
     expect(test[3]).toEqual({ x: 'd', z: 100 })
+  })
+})
+
+describe('gather', () => {
+  it('throws if you pass in any non-strings', () => {
+    const test = new Ply(ds6)
+    expect(() => test.gather()).toThrow()
+    expect(() => test.gather(1, 2, 3, 4)).toThrow()
+  })
+  it('gathers when keys are provided', () => {
+    const test = new Ply(ds6).gather('A', 'V', 'length', 'width').transform()
+    expect(test[0]).toEqual({
+      A: 'length', V: 10, x: 10, y: 20,
+    })
+    expect(test[1]).toEqual({
+      A: 'width', V: 20, x: 10, y: 20,
+    })
+    expect(test[2]).toEqual({
+      A: 'length', V: 5, x: 1, y: 2,
+    })
+    expect(test[3]).toEqual({
+      A: 'width', V: 10, x: 1, y: 2,
+    })
   })
 })
